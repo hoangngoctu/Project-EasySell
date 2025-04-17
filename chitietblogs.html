@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="EasySell đạt Top 10 Sản phẩm & Dịch vụ Tin Dùng 2025 tại chương trình do Tạp chí Kinh tế Việt Nam tổ chức, khẳng định chất lượng vượt trội trong lĩnh vực công nghệ." />
+    <meta name="keywords" content="EasySell, Top 10, Sản phẩm Tin Dùng 2025, Tạp chí Kinh tế Việt Nam, công nghệ, quản lý bán hàng" />
+    <meta name="author" content="EasySell Team" />
+    <meta name="robots" content="index, follow" />
+    <title>EasySell Đạt Top 10 Sản Phẩm & Dịch Vụ Tin Dùng 2025 - Blog EasySell</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon-16x16.png" type="image/x-icon">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Custom CSS -->
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f7fafc;
+        }
+        a { text-decoration: none !important; }
+        a:hover { text-decoration: none !important; }
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand img { max-height: 40px; }
+        .btn-login {
+            background: linear-gradient(90deg, #108AB1, #0e6f8c);
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            background: linear-gradient(90deg, #0e6f8c, #108AB1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(16, 138, 177, 0.4);
+        }
+        .article-header {
+            background: linear-gradient(135deg, #108AB1 0%, #6dd5ed 100%);
+            color: #fff;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+        .article-header h1 {
+            font-size: 36px;
+            font-weight: 600;
+        }
+        .article-meta { font-size: 14px; }
+        .post-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .post-content p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        .post-content h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin: 30px 0 15px;
+        }
+        .badge-category { background: #108AB1; }
+        .related-posts .card {
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        .related-posts .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .related-posts img {
+            border-radius: 10px;
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .btn-more {
+            background: linear-gradient(90deg, #108AB1, #0e6f8c);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        .btn-more:hover {
+            background: linear-gradient(90deg, #0e6f8c, #108AB1);
+            box-shadow: 0 4px 15px rgba(16, 138, 177, 0.4);
+            color: #fff;
+        }
+        /* Điều chỉnh sidebar */
+        .sidebar .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        .sidebar .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar .card-header {
+            background: linear-gradient(90deg, #108AB1, #0e6f8c);
+            color: #fff;
+            font-weight: 500;
+            border-radius: 10px 10px 0 0;
+            padding: 15px;
+        }
+        .sidebar .card-body {
+            padding: 20px;
+            background: #fff;
+            border-radius: 0 0 10px 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #108AB1, #0e6f8c);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #0e6f8c, #108AB1);
+            box-shadow: 0 4px 15px rgba(16, 138, 177, 0.4);
+        }
+        /* Tinh chỉnh Search Widget */
+        .sidebar .card .input-group {
+            border-radius: 25px;
+            overflow: hidden;
+        }
+        .sidebar .card .form-control {
+            border: 1px solid #ddd;
+            border-right: none;
+        }
+        .sidebar .card #button-search {
+            border-radius: 0 25px 25px 0;
+        }
+        /* Danh Mục Widget */
+        .sidebar .card ul li a {
+            color: #108AB1;
+            transition: color 0.3s ease;
+        }
+        .sidebar .card ul li a:hover {
+            color: #0e6f8c;
+        }
+        /* Newsletter Widget */
+        .sidebar .card form .input-group {
+            border-radius: 25px;
+            overflow: hidden;
+        }
+        .sidebar .card form .form-control {
+            border: 1px solid #ddd;
+            border-right: none;
+        }
+        .sidebar .card form .btn-primary {
+            border-radius: 0 25px 25px 0;
+        }
+        footer {
+            background: #1e3c72;
+            color: #fff;
+            padding: 40px 0 20px;
+        }
+        footer a { color: #fff; }
+        footer a:hover { color: #6dd5ed; }
+        .toc {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        .toc h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        .toc ul li {
+            margin-bottom: 10px;
+        }
+        .toc ul li a {
+            color: #108AB1;
+            transition: color 0.3s ease;
+        }
+        .toc ul li a:hover {
+            color: #0e6f8c;
+        }
+        .social-connect .card-header {
+            background: linear-gradient(90deg, #108AB1, #0e6f8c);
+            color: #fff;
+        }
+        .social-connect .list-group-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .social-connect .list-group-item:hover {
+            background: #f7fafc;
+            border-left: 3px solid #108AB1;
+        }
+        .social-connect .list-group-item i {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        .social-connect .list-group-item .social-info {
+            flex: 1;
+        }
+        .social-connect .list-group-item .social-info h6 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .social-connect .list-group-item .social-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .social-connect .list-group-item.active-zalo { border-left: 3px solid #00c300; }
+        .social-connect .list-group-item.active-fb { border-left: 3px solid #3b5998; }
+        .social-connect .list-group-item.active-tiktok { border-left: 3px solid #000; }
+        .social-connect .list-group-item.active-youtube { border-left: 3px solid #ff0000; }
+        .ad-banner img {
+            width: 100%;
+            height: 750px; /* Chiều cao cố định */
+            object-fit: cover; /* Đảm bảo hình ảnh không bị méo */
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        .ad-banner img:hover {
+            transform: scale(1.02);
+        }
+        /* Thay đổi màu thanh cuộn */
+        ::-webkit-scrollbar {
+            width: 12px; /* Chiều rộng thanh cuộn */
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; /* Màu nền thanh cuộn */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0e6f8c; /* Màu của thanh cuộn */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #108AB1; /* Màu khi di chuột qua thanh cuộn */
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container px-lg-5">
+            <a class="navbar-brand" href="/index.html">
+                <img src="/img/logo.png" alt="EasySell Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-3 align-items-center">
+                    <li class="nav-item"><a class="nav-link active text-dark fw-medium" href="/index.html">Trang Chủ</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark fw-medium" href="/Lienhe.html">Liên Hệ</a></li>
+                    <li class="nav-item"><a class="nav-link active text-dark fw-medium" href="/blog.html">Bài Viết</a></li>
+                    <li class="nav-item"><a class="btn btn-login text-white px-4 py-2 rounded-pill" href="/auth/dangnhap.html">Đăng Nhập</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <article class="post-content">
+                    <header class="mb-4">
+                        <h1 class="fw-bolder mb-1">EasySell Đạt Top 10 Sản Phẩm & Dịch Vụ Tin Dùng 2025</h1>
+                        <div class="text-muted fst-italic mb-2">Đăng ngày 20/12/2025 bởi EasySell Team</div>
+                        <a class="badge badge-category text-white text-decoration-none" href="#!">Công Nghệ</a>
+                        <a class="badge badge-category text-white text-decoration-none" href="#!">EasySell</a>
+                    </header>
+                    <figure class="mb-4">
+                        <img class="img-fluid rounded" src="/img/banner 3 1200-50.png" alt="EasySell đạt Top 10 Sản phẩm & Dịch vụ Tin Dùng 2025" />
+                    </figure>
+                    <!-- Table of Contents -->
+                    <div class="toc">
+                        <h3>Mục Lục</h3>
+                        <ul>
+                            <li><a href="#thanh-tuu">1. Thành Tựu Nổi Bật Của EasySell</a></li>
+                            <li><a href="#chuong-trinh-tin-dung">2. Chương Trình Tin Dùng Việt Nam 2025</a></li>
+                            <li><a href="#cam-ket">3. Cam Kết Phát Triển Trong Tương Lai</a></li>
+                        </ul>
+                    </div>
+                    <section class="mb-5">
+                        <p class="fs-5 mb-4">Ngày 20/12 vừa qua, tại chương trình <strong>Tin Dùng Việt Nam 2025</strong> do Tạp chí Kinh tế Việt Nam tổ chức, EasySell đã vinh dự được xướng tên trong <strong>Top 10 Sản phẩm & Dịch vụ Tin Dùng 2025</strong> – Nhóm ngành sản phẩm, dịch vụ công nghệ. Đây là cột mốc quan trọng, khẳng định vị thế của EasySell trong việc mang đến các giải pháp quản lý bán hàng tối ưu cho doanh nghiệp Việt.</p>
+                        <h2 class="fw-bolder mb-4 mt-5" id="thanh-tuu">1. Thành Tựu Nổi Bật Của EasySell</h2>
+                        <p class="fs-5 mb-4">EasySell đã không ngừng cải tiến để đáp ứng nhu cầu của các doanh nghiệp, từ quản lý đơn hàng thông minh, phân tích doanh thu theo thời gian thực, đến tích hợp thanh toán đa dạng. Giải thưởng này là minh chứng cho sự tin tưởng của khách hàng và chất lượng vượt trội của nền tảng.</p>
+                        <h2 class="fw-bolder mb-4 mt-5" id="chuong-trinh-tin-dung">2. Chương Trình Tin Dùng Việt Nam 2025</h2>
+                        <p class="fs-5 mb-4">Chương trình Tin Dùng Việt Nam được tổ chức thường niên bởi Tạp chí Kinh tế Việt Nam, nhằm tôn vinh các sản phẩm và dịch vụ chất lượng cao, được người tiêu dùng đánh giá cao. Việc EasySell lọt vào Top 10 là kết quả của quá trình đánh giá khắt khe dựa trên các tiêu chí như độ tin cậy, tính sáng tạo và sự hài lòng của khách hàng.</p>
+                        <h2 class="fw-bolder mb-4 mt-5" id="cam-ket">3. Cam Kết Phát Triển Trong Tương Lai</h2>
+                        <p class="fs-5 mb-4">Với thành tựu này, EasySell cam kết tiếp tục đổi mới, mang đến những giải pháp công nghệ tiên tiến hơn nữa để hỗ trợ doanh nghiệp Việt Nam phát triển bền vững. Chúng tôi sẽ không ngừng nâng cấp sản phẩm, mở rộng tính năng và cải thiện trải nghiệm người dùng.</p>
+                    </section>
+                </article>
+
+                <!-- Related Posts Section -->
+                <section class="related-posts mb-5">
+                    <h2 class="fw-bolder mb-4">Bài Viết Liên Quan</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <img src="/img/baiviet400x400 3.png" class="card-img-top" alt="5 mẹo bán hàng online hiệu quả" />
+                                <div class="card-body">
+                                    <h5 class="card-title">5 Mẹo Bán Hàng Online Hiệu Quả</h5>
+                                    <p class="card-text">Khám phá những chiến lược đơn giản nhưng hiệu quả để tăng doanh số bán hàng trực tuyến trong mùa lễ hội.</p>
+                                    <div class="text-muted fst-italic mb-2">Đăng ngày 25/12/2025 bởi EasySell Team</div>
+                                    <a href="#!" class="btn btn-primary">Đọc Thêm</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <img src="/img/baiviet400x400 4.png" class="card-img-top" alt="Tối ưu hóa quy trình giao hàng" />
+                                <div class="card-body">
+                                    <h5 class="card-title">Tối Ưu Hóa Quy Trình Giao Hàng</h5>
+                                    <p class="card-text">Học cách cải thiện quy trình giao hàng để tăng sự hài lòng của khách hàng và giữ chân họ lâu dài.</p>
+                                    <div class="text-muted fst-italic mb-2">Đăng ngày 26/12/2025 bởi EasySell Team</div>
+                                    <a href="#!" class="btn btn-primary">Đọc Thêm</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <img src="/img/baiviet400x400 2.png" class="card-img-top" alt="Cách quảng cáo hiệu quả mùa lễ hội" />
+                                <div class="card-body">
+                                    <h5 class="card-title">Cách Quảng Cáo Hiệu Quả Mùa Lễ Hội</h5>
+                                    <p class="card-text">Tìm hiểu các phương pháp quảng cáo giúp thu hút khách hàng và tăng doanh thu trong mùa lễ.</p>
+                                    <div class="text-muted fst-italic mb-2">Đăng ngày 27/12/2025 bởi EasySell Team</div>
+                                    <a href="#!" class="btn btn-primary">Đọc Thêm</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <img src="/img/baivietlienquna336x180.png" class="card-img-top" alt="Sử dụng EasySell để quản lý kho" />
+                                <div class="card-body">
+                                    <h5 class="card-title">Sử Dụng EasySell Để Quản Lý Kho</h5>
+                                    <p class="card-text">Hướng dẫn cách quản lý kho hàng hiệu quả với EasySell để tránh tình trạng hết hàng mùa cao điểm.</p>
+                                    <div class="text-muted fst-italic mb-2">Đăng ngày 28/12/2025 bởi EasySell Team</div>
+                                    <a href="#!" class="btn btn-primary">Đọc Thêm</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <a href="/blog.html" class="btn btn-more">Xem Thêm Bài Viết</a>
+                    </div>
+                </section>
+            </div>
+            <!-- Sidebar Widgets -->
+            <div class="col-lg-4 sidebar">
+                <!-- Search Widget -->
+                <div class="card mb-4">
+                    <div class="card-header">Tìm Kiếm</div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input class="form-control" type="text" placeholder="Nhập từ khóa..." aria-label="Nhập từ khóa..." aria-describedby="button-search" />
+                            <button class="btn btn-primary" id="button-search" type="button">Tìm!</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Categories Widget -->
+                <div class="card mb-4">
+                    <div class="card-header">Danh Mục</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <ul class="list-unstyled mb-0">
+                                    <li><a href="#!">Kinh Doanh</a></li>
+                                    <li><a href="#!">Bán Hàng Online</a></li>
+                                    <li><a href="#!">Quản Lý</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-6">
+                                <ul class="list-unstyled mb-0">
+                                    <li><a href="#!">Tối Ưu Hóa</a></li>
+                                    <li><a href="#!">EasySell</a></li>
+                                    <li><a href="#!">Mẹo Hay</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Social Connect Widget -->
+                <div class="card mb-4 social-connect">
+                    <div class="card-header">Kết Nối Với Chúng Tôi</div>
+                    <ul class="list-group list-group-flush">
+                        <a href="#zalo">
+                            <li class="list-group-item active-zalo">
+                                <i class="fab fa-whatsapp text-success"></i>
+                                <div class="social-info">
+                                    <h6>Zalo Official</h6>
+                                    <p>Liên hệ với chúng tôi qua Zalo</p>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </li>
+                        </a>
+                        <a href="#tiktok">
+                            <li class="list-group-item active-tiktok">
+                                <i class="fab fa-tiktok text-dark"></i>
+                                <div class="social-info">
+                                    <h6>TikTok Official</h6>
+                                    <p>Xem video mỗi ngày của chúng tôi</p>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </li>
+                        </a>
+                        <a href="#facebook">
+                            <li class="list-group-item active-fb">
+                                <i class="fab fa-facebook text-primary"></i>
+                                <div class="social-info">
+                                    <h6>Facebook Fanpage</h6>
+                                    <p>Theo dõi chúng tôi trên Facebook</p>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </li>
+                        </a>
+                        <a href="#youtube">
+                            <li class="list-group-item active-youtube">
+                                <i class="fab fa-youtube text-danger"></i>
+                                <div class="social-info">
+                                    <h6>YouTube Channel</h6>
+                                    <p>Đăng ký kênh để xem nhiều video hơn</p>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </li>
+                        </a>
+                    </ul>
+                </div>
+                <!-- Newsletter Widget -->
+                <div class="card mb-4">
+                    <div class="card-header">Đăng Ký Nhận Tin</div>
+                    <div class="card-body">
+                        <p>Nhận thông tin khuyến mãi và mẹo bán hàng mới nhất từ EasySell!</p>
+                        <form>
+                            <div class="input-group mb-3">
+                                <input type="email" class="form-control" placeholder="Nhập email của bạn..." aria-label="Email" />
+                                <button class="btn btn-primary" type="submit">Đăng Ký</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- Side Widget -->
+                <div class="card mb-4">
+                    <div class="card-header">Thông Tin Thêm</div>
+                    <div class="card-body">Đăng ký ngay EasySell để nhận ưu đãi đặc biệt mùa lễ hội và tăng doanh thu vượt trội!</div>
+                </div>
+                <!-- Advertisement Banner -->
+                <div class="ad-banner mb-4">
+                    <a href="https://menu.eposvn.com/">
+                        <img src="/img/QrEpos300x750.png" alt="Quảng cáo EasySell" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-center text-lg-start text-white reveal-section">
+        <div class="container p-4">
+            <div class="row my-4">
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <div class="rounded-circle bg-white shadow-1-strong d-flex align-items-center justify-content-center mb-4 mx-auto" style="width: 150px; height: 150px;">
+                        <img src="/img/logo.png" height="70" alt="EasySell Logo" loading="lazy" />
+                    </div>
+                    <p class="text-center">EasySell - Giải pháp quản lý bán hàng tối ưu cho doanh nghiệp của bạn.</p>
+                    <ul class="list-unstyled d-flex flex-row justify-content-center">
+                        <li><a class="text-white px-2" href="#" target="_blank"><i class="fab fa-facebook-square"></i></a></li>
+                        <li><a class="text-white px-2" href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+                        <li><a class="text-white ps-2" href="#" target="_blank"><i class="fab fa-youtube"></i></a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase mb-4">Dịch Vụ</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/index.html" class="text-white">Tính Năng</a></li>
+                        <li class="mb-2"><a href="/index.html" class="text-white">Bảng Giá</a></li>
+                        <li class="mb-2"><a href="/thanhtoan.html" class="text-white">Thanh Toán</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase mb-4">Thông Tin</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/gioithieu.html" class="text-white">Giới Thiệu</a></li>
+                        <li class="mb-2"><a href="/index.html" class="text-white">Khách Hàng</a></li>
+                        <li class="mb-2"><a href="/blog.html" class="text-white">Bài Viết</a></li>
+                        <li class="mb-2"><a href="/Lienhe.html" class="text-white">Liên Hệ</a></li>
+                        <li class="mb-2"><a href="/chinhsachbaomat.html" class="text-white">Chính Sách Bảo Mật</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-uppercase mb-4">Liên Hệ</h5>
+                    <ul class="list-unstyled">
+                        <li><p><i class="fas fa-map-marker-alt pe-2"></i>Ngõ 85 Lê Văn Hiến, Bắc Từ Liêm, Hà Nội</p></li>
+                        <li><p><i class="fas fa-phone pe-2"></i>0336141436</p></li>
+                        <li><p><i class="fas fa-envelope pe-2 mb-0"></i>support@easysell.vn</p></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="text-center p-3" style="background-color:#108AB1">
+            © 2025 Copyright:
+            <a class="text-white" href="https://easysell.vn">EasySell.vn</a>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

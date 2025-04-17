@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Quản Lý - Super Admin</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon-16x16.png" type="image/x-icon">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #108AB1;
+            padding-top: 20px;
+            transition: 0.3s ease;
+            z-index: 1000;
+        }
+        .sidebar .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            color: white;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: #0d6f8f;
+        }
+        .sidebar a i {
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: 0.3s ease;
+            min-height: 100vh;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+
+        /* Navbar Top */
+        .navbar-top {
+            background-color: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        .navbar-top .user-info img {
+            width: 40px;
+            border-radius: 50%;
+        }
+
+        /* Cards */
+        .stat-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Table */
+        .table {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .table th {
+            background-color: #108AB1;
+            color: white;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        /* Settings Card */
+        .settings-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        #currentDateTime {
+            font-size: 14px;
+            color: #555;
+            background-color: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* Responsive */
+        .sidebar-toggle {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .sidebar.active {
+                width: 250px;
+            }
+            .sidebar-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <img src="/img/logo.png" alt="Super Admin Logo" style="width: 100px;" />
+        </div>
+        <a data-section="dashboard" class="active"><i class="bi bi-house-door"></i> Tổng Quan</a>
+        <a data-section="accounts"><i class="bi bi-person"></i> Quản Lý Tài Khoản</a>
+        <a data-section="packages"><i class="bi bi-box"></i> Gói Dịch Vụ</a>
+        <a data-section="coupons"><i class="bi bi-ticket-perforated"></i> Mã Giảm Giá</a>
+        <a data-section="posts"><i class="bi bi-file-earmark-text"></i> Quản Lý Bài Viết</a>
+        <a data-section="settings"><i class="bi bi-gear"></i> Cài Đặt</a>
+        <a href="/auth/dangnhap.html"><i class="bi bi-box-arrow-right"></i> Đăng Xuất</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar Top -->
+        <div class="navbar-top d-flex justify-content-between align-items-center">
+            <button class="btn sidebar-toggle" id="toggleBtn">
+                <i class="bi bi-list" style="font-size: 1.5rem;"></i>
+            </button>
+            <div class="user-info d-flex align-items-center">
+                <span class="me-2">Xin chào, <strong>Super Admin</strong></span>
+                <img src="/img/profile.png" alt="User" />
+                <span id="currentDateTime" class="me-2"></span>
+            </div>
+        </div>
+
+        <!-- Các Section -->
+        <div class="container-fluid mt-4">
+            <!-- --------------------------Section: Tổng Quan----------------------------------->
+            <div class="section active" id="dashboard">
+                <h2 class="mb-4">Tổng Quan</h2>
+                <div class="row g-4 mb-5">
+                    <div class="col-md-3 col-sm-6">
+                        <div class="stat-card p-4 bg-primary text-white">
+                            <h5>Tổng Tài Khoản</h5>
+                            <h3>500</h3>
+                            <small>+10% so với tháng trước | 450 tài khoản</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="stat-card p-4 bg-success text-white">
+                            <h5>Gói Đã Đăng Ký</h5>
+                            <h3>320</h3>
+                            <small>+5% so với tháng trước | 305 gói</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="stat-card p-4 bg-info text-white">
+                            <h5>Mã Giảm Giá Hoạt Động</h5>
+                            <h3>25</h3>
+                            <small>Tổng: 40 mã</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="stat-card p-4 bg-warning text-white">
+                            <h5>Bài Viết</h5>
+                            <h3>150</h3>
+                            <small>+3 bài mới trong tuần</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h3 class="mb-4">Tài Khoản Đăng Ký Theo Tháng (2025)</h3>
+                            <canvas id="accountChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h3 class="mb-4">Tỷ Lệ Gói Dịch Vụ</h3>
+                            <canvas id="packageChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ----------------------Section: Quản Lý Tài Khoản ------------------------------>
+    <div class="section" id="accounts">
+        <h2 class="mb-4">Quản Lý Tài Khoản</h2>
+        <div class="filter-bar d-flex flex-wrap gap-3">
+            <div class="flex-grow-1">
+                <label class="form-label">Tìm kiếm</label>
+                <input type="text" class="form-control" placeholder="Tên, email..." />
+            </div>
+            <div>
+                <label class="form-label">Trạng thái</label>
+                <select class="form-select">
+                    <option>Tất cả</option>
+                    <option>Hoạt động</option>
+                    <option>Khóa</option>
+                </select>
+            </div>
+            <div class="align-self-end">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAccountModal">Thêm Tài Khoản</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên</th>
+                        <th>Email</th>
+                        <th>Vai Trò</th>
+                        <th>Ngày Tạo</th>
+                        <th>Trạng Thái</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#001</td>
+                        <td>Hoàng Ngọc Tú</td>
+                        <td>htu25578@gmail.com</td>
+                        <td>Admin</td>
+                        <td>01/01/2025</td>
+                        <td><span class="badge bg-success">Hoạt động</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewAccountModal"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAccountModal"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#002</td>
+                        <td>Trần Thị B</td>
+                        <td>tran.b@example.com</td>
+                        <td>User</td>
+                        <td>05/04/2025</td>
+                        <td><span class="badge bg-danger">Khóa</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewAccountModal"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAccountModal"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#003</td>
+                        <td>Lê Văn C</td>
+                        <td>le.c@example.com</td>
+                        <td>User</td>
+                        <td>10/03/2025</td>
+                        <td><span class="badge bg-success">Hoạt động</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewAccountModal"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAccountModal"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#004</td>
+                        <td>Phạm Thị D</td>
+                        <td>pham.d@example.com</td>
+                        <td>User</td>
+                        <td>15/02/2025</td>
+                        <td><span class="badge bg-success">Hoạt động</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewAccountModal"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAccountModal"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#005</td>
+                        <td>Hoàng Văn E</td>
+                        <td>hoang.e@example.com</td>
+                        <td>User</td>
+                        <td>20/01/2025</td>
+                        <td><span class="badge bg-danger">Khóa</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewAccountModal"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAccountModal"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#006</td>
+                        <td>Vũ Thị F</td>
+                        <td>vu.f@example.com</td>
+                        <td>User</td>
+                        <td>25/03/2025</td>
+                        <td><span class="badge bg-success">Hoạt động</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewAccountModal"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAccountModal"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#007</td>
+                        <td>Đặng Văn G</td>
+                        <td>dang.g@example.com</td>
+                        <td>User</td>
+                        <td>30/04/2025</td>
+                        <td><span class="badge bg-success">Hoạt động</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewAccountModal"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAccountModal"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#008</td>
+                        <td>Bùi Thị H</td>
+                        <td>bui.h@example.com</td>
+                        <td>User</td>
+                        <td>02/04/2025</td>
+                        <td><span class="badge bg-success">Hoạt động</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewAccountModal"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAccountModal"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#009</td>
+                        <td>Ngô Văn I</td>
+                        <td>ngo.i@example.com</td>
+                        <td>User</td>
+                        <td>05/03/2025</td>
+                        <td><span class="badge bg-danger">Khóa</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewAccountModal"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAccountModal"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#010</td>
+                        <td>Đỗ Thị K</td>
+                        <td>do.k@example.com</td>
+                        <td>User</td>
+                        <td>10/02/2025</td>
+                        <td><span class="badge bg-success">Hoạt động</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewAccountModal"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editAccountModal"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+            <!-- Modal Thêm Tài Khoản -->
+            <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addAccountModalLabel">Thêm Tài Khoản</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Tên</label>
+                                    <input type="text" class="form-control" placeholder="Nhập tên" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" placeholder="Nhập email" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Vai Trò</label>
+                                    <input type="text" class="form-control" value="User" readonly />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mật Khẩu</label>
+                                    <input type="password" class="form-control" placeholder="Nhập mật khẩu" />
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-primary">Thêm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Xem Tài Khoản -->
+            <div class="modal fade" id="viewAccountModal" tabindex="-1" aria-labelledby="viewAccountModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="viewAccountModalLabel">Chi Tiết Tài Khoản #001</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>ID:</strong> #001</p>
+                            <p><strong>Tên:</strong> Hoàng Ngọc Tú</p>
+                            <p><strong>Email:</strong> htu25578@gmail.com</p>
+                            <p><strong>Vai Trò:</strong> Admin</p>
+                            <p><strong>Ngày Tạo:</strong> 01/01/2025</p>
+                            <p><strong>Trạng Thái:</strong> Hoạt động</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Chỉnh Sửa Tài Khoản -->
+            <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editAccountModalLabel">Chỉnh Sửa Tài Khoản #001</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Tên</label>
+                                    <input type="text" class="form-control" value="Hoàng Ngọc Tú" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" value="htu25578@g,gmail.com" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Vai Trò</label>
+                                    <select class="form-select">
+                                        <option selected>Admin</option>
+                                        <option>User</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Trạng Thái</label>
+                                    <select class="form-select">
+                                        <option selected>Hoạt động</option>
+                                        <option>Khóa</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-primary">Lưu</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Xóa Tài Khoản -->
+            <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteAccountModalLabel">Xóa Tài Khoản</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Bạn có chắc chắn muốn xóa tài khoản <strong>Hoàng Ngọc Tú</strong>?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-danger">Xóa</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+       <!------------------------------ Section: Gói Dịch Vụ ------------------------------->
+<div class="section" id="packages">
+    <h2 class="mb-4">Gói Dịch Vụ</h2>
+    <div class="filter-bar d-flex flex-wrap gap-3">
+        <div class="flex-grow-1">
+            <label class="form-label">Tìm kiếm</label>
+            <input type="text" class="form-control" placeholder="Mã gói, tên gói..." />
+        </div>
+        <div class="align-self-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPackageModal">Thêm Gói</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Mã Gói</th>
+                    <th>Tên Gói</th>
+                    <th>Giá (VNĐ)</th>
+                    <th>Thời Hạn</th>
+                    <th>Tính Năng Chính</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>PK001</td>
+                    <td>Gói Starter</td>
+                    <td>0</td>
+                    <td>30 ngày</td>
+                    <td>50 đơn hàng/tháng, 1 nền tảng, hỗ trợ email</td>
+                    <td><span class="badge bg-success">Hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewPackageModal_PK001"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editPackageModal_PK001"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePackageModal_PK001"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>PK002</td>
+                    <td>Gói Basic</td>
+                    <td>199,000</td>
+                    <td>30 ngày</td>
+                    <td>200 đơn hàng/tháng, 3 nền tảng, hỗ trợ email + chat</td>
+                    <td><span class="badge bg-success">Hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewPackageModal_PK002"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editPackageModal_PK002"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePackageModal_PK002"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>PK003</td>
+                    <td>Gói Pro</td>
+                    <td>499,000</td>
+                    <td>30 ngày</td>
+                    <td>1,000 đơn hàng/tháng, 5 nền tảng, hỗ trợ 24/7</td>
+                    <td><span class="badge bg-success">Hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewPackageModal_PK003"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editPackageModal_PK003"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePackageModal_PK003"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>PK004</td>
+                    <td>Gói Premium</td>
+                    <td>999,000</td>
+                    <td>30 ngày</td>
+                    <td>5,000 đơn hàng/tháng, nền tảng không giới hạn, hỗ trợ riêng</td>
+                    <td><span class="badge bg-success">Hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewPackageModal_PK004"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editPackageModal_PK004"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePackageModal_PK004"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>PK005</td>
+                    <td>Gói Enterprise</td>
+                    <td>Liên hệ</td>
+                    <td>Tùy chỉnh</td>
+                    <td>Không giới hạn đơn hàng, tùy chỉnh hệ thống, server riêng</td>
+                    <td><span class="badge bg-warning">Ẩn</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewPackageModal_PK005"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editPackageModal_PK005"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePackageModal_PK005"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm Gói Dịch Vụ -->
+<div class="modal fade" id="addPackageModal" tabindex="-1" aria-labelledby="addPackageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPackageModalLabel">Thêm Gói Dịch Vụ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/packages/add" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Mã Gói</label>
+                        <input type="text" class="form-control" name="code" placeholder="Nhập mã gói (VD: PK006)" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tên Gói</label>
+                        <input type="text" class="form-control" name="name" placeholder="Nhập tên gói" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá (VNĐ)</label>
+                        <input type="text" class="form-control" name="price" placeholder="Nhập giá hoặc 'Liên hệ'" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời Hạn</label>
+                        <input type="text" class="form-control" name="duration" placeholder="Nhập số ngày hoặc 'Tùy chỉnh'" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tính Năng Chính</label>
+                        <textarea class="form-control" name="features" placeholder="Nhập các tính năng, cách nhau bằng dấu phẩy" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="active">Hoạt động</option>
+                            <option value="hidden">Ẩn</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Gói Dịch Vụ (PK001 - Starter) -->
+<div class="modal fade" id="viewPackageModal_PK001" tabindex="-1" aria-labelledby="viewPackageModalLabel_PK001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewPackageModalLabel_PK001">Chi Tiết Gói Dịch Vụ PK001</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Gói:</strong> PK001</p>
+                <p><strong>Tên Gói:</strong> Gói Starter</p>
+                <p><strong>Giá (VNĐ):</strong> 0</p>
+                <p><strong>Thời Hạn:</strong> 30 ngày</p>
+                <p><strong>Tính Năng:</strong></p>
+                <ul>
+                    <li>Quản lý 50 đơn hàng/tháng</li>
+                    <li>Tích hợp 1 nền tảng bán hàng</li>
+                    <li>Hỗ trợ qua email</li>
+                    <li>Báo cáo cơ bản</li>
+                </ul>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Gói Dịch Vụ (PK002 - Basic) -->
+<div class="modal fade" id="viewPackageModal_PK002" tabindex="-1" aria-labelledby="viewPackageModalLabel_PK002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewPackageModalLabel_PK002">Chi Tiết Gói Dịch Vụ PK002</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Gói:</strong> PK002</p>
+                <p><strong>Tên Gói:</strong> Gói Basic</p>
+                <p><strong>Giá (VNĐ):</strong> 199,000</p>
+                <p><strong>Thời Hạn:</strong> 30 ngày</p>
+                <p><strong>Tính Năng:</strong></p>
+                <ul>
+                    <li>Quản lý 200 đơn hàng/tháng</li>
+                    <li>Tích hợp 3 nền tảng bán hàng</li>
+                    <li>Hỗ trợ qua email + chat</li>
+                    <li>Báo cáo nâng cao</li>
+                    <li>Phân tích doanh thu cơ bản</li>
+                </ul>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Gói Dịch Vụ (PK003 - Pro) -->
+<div class="modal fade" id="viewPackageModal_PK003" tabindex="-1" aria-labelledby="viewPackageModalLabel_PK003" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewPackageModalLabel_PK003">Chi Tiết Gói Dịch Vụ PK003</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Gói:</strong> PK003</p>
+                <p><strong>Tên Gói:</strong> Gói Pro</p>
+                <p><strong>Giá (VNĐ):</strong> 499,000</p>
+                <p><strong>Thời Hạn:</strong> 30 ngày</p>
+                <p><strong>Tính Năng:</strong></p>
+                <ul>
+                    <li>Quản lý 1,000 đơn hàng/tháng</li>
+                    <li>Tích hợp 5 nền tảng bán hàng</li>
+                    <li>Hỗ trợ 24/7 qua chat + điện thoại</li>
+                    <li>Báo cáo chi tiết</li>
+                    <li>Phân tích doanh thu nâng cao</li>
+                    <li>Quản lý kho hàng</li>
+                </ul>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Gói Dịch Vụ (PK004 - Premium) -->
+<div class="modal fade" id="viewPackageModal_PK004" tabindex="-1" aria-labelledby="viewPackageModalLabel_PK004" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewPackageModalLabel_PK004">Chi Tiết Gói Dịch Vụ PK004</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Gói:</strong> PK004</p>
+                <p><strong>Tên Gói:</strong> Gói Premium</p>
+                <p><strong>Giá (VNĐ):</strong> 999,000</p>
+                <p><strong>Thời Hạn:</strong> 30 ngày</p>
+                <p><strong>Tính Năng:</strong></p>
+                <ul>
+                    <li>Quản lý 5,000 đơn hàng/tháng</li>
+                    <li>Tích hợp không giới hạn nền tảng</li>
+                    <li>Hỗ trợ 24/7 + quản lý tài khoản riêng</li>
+                    <li>Báo cáo tùy chỉnh</li>
+                    <li>Phân tích doanh thu chuyên sâu</li>
+                    <li>Quản lý kho + vận chuyển</li>
+                    <li>Ưu tiên xử lý dữ liệu</li>
+                </ul>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Gói Dịch Vụ (PK005 - Enterprise) -->
+<div class="modal fade" id="viewPackageModal_PK005" tabindex="-1" aria-labelledby="viewPackageModalLabel_PK005" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewPackageModalLabel_PK005">Chi Tiết Gói Dịch Vụ PK005</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Gói:</strong> PK005</p>
+                <p><strong>Tên Gói:</strong> Gói Enterprise</p>
+                <p><strong>Giá (VNĐ):</strong> Liên hệ</p>
+                <p><strong>Thời Hạn:</strong> Tùy chỉnh</p>
+                <p><strong>Tính Năng:</strong></p>
+                <ul>
+                    <li>Quản lý không giới hạn đơn hàng</li>
+                    <li>Tích hợp không giới hạn nền tảng</li>
+                    <li>Hỗ trợ 24/7 + đội ngũ chuyên gia</li>
+                    <li>Báo cáo tùy chỉnh toàn diện</li>
+                    <li>Phân tích AI dự đoán doanh thu</li>
+                    <li>Quản lý kho + vận chuyển nâng cao</li>
+                    <li>Tùy chỉnh hệ thống theo yêu cầu</li>
+                    <li>Server riêng biệt</li>
+                </ul>
+                <p><strong>Trạng Thái:</strong> Ẩn</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa Gói Dịch Vụ (PK001 - Starter) -->
+<div class="modal fade" id="editPackageModal_PK001" tabindex="-1" aria-labelledby="editPackageModalLabel_PK001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPackageModalLabel_PK001">Chỉnh Sửa Gói Dịch Vụ PK001</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/packages/edit/PK001" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Mã Gói</label>
+                        <input type="text" class="form-control" name="code" value="PK001" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tên Gói</label>
+                        <input type="text" class="form-control" name="name" value="Gói Starter" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá (VNĐ)</label>
+                        <input type="text" class="form-control" name="price" value="0" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời Hạn</label>
+                        <input type="text" class="form-control" name="duration" value="30 ngày" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tính Năng Chính</label>
+                        <textarea class="form-control" name="features" required>Quản lý 50 đơn hàng/tháng, Tích hợp 1 nền tảng bán hàng, Hỗ trợ qua email, Báo cáo cơ bản</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="active" selected>Hoạt động</option>
+                            <option value="hidden">Ẩn</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa Gói Dịch Vụ (PK002 - Basic) -->
+<div class="modal fade" id="editPackageModal_PK002" tabindex="-1" aria-labelledby="editPackageModalLabel_PK002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPackageModalLabel_PK002">Chỉnh Sửa Gói Dịch Vụ PK002</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/packages/edit/PK002" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Mã Gói</label>
+                        <input type="text" class="form-control" name="code" value="PK002" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tên Gói</label>
+                        <input type="text" class="form-control" name="name" value="Gói Basic" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá (VNĐ)</label>
+                        <input type="text" class="form-control" name="price" value="199000" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời Hạn</label>
+                        <input type="text" class="form-control" name="duration" value="30 ngày" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tính Năng Chính</label>
+                        <textarea class="form-control" name="features" required>Quản lý 200 đơn hàng/tháng, Tích hợp 3 nền tảng bán hàng, Hỗ trợ qua email + chat, Báo cáo nâng cao, Phân tích doanh thu cơ bản</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="active" selected>Hoạt động</option>
+                            <option value="hidden">Ẩn</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa Gói Dịch Vụ (PK003 - Pro) -->
+<div class="modal fade" id="editPackageModal_PK003" tabindex="-1" aria-labelledby="editPackageModalLabel_PK003" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPackageModalLabel_PK003">Chỉnh Sửa Gói Dịch Vụ PK003</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/packages/edit/PK003" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Mã Gói</label>
+                        <input type="text" class="form-control" name="code" value="PK003" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tên Gói</label>
+                        <input type="text" class="form-control" name="name" value="Gói Pro" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá (VNĐ)</label>
+                        <input type="text" class="form-control" name="price" value="499000" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời Hạn</label>
+                        <input type="text" class="form-control" name="duration" value="30 ngày" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tính Năng Chính</label>
+                        <textarea class="form-control" name="features" required>Quản lý 1,000 đơn hàng/tháng, Tích hợp 5 nền tảng bán hàng, Hỗ trợ 24/7 qua chat + điện thoại, Báo cáo chi tiết, Phân tích doanh thu nâng cao, Quản lý kho hàng</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="active" selected>Hoạt động</option>
+                            <option value="hidden">Ẩn</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa Gói Dịch Vụ (PK004 - Premium) -->
+<div class="modal fade" id="editPackageModal_PK004" tabindex="-1" aria-labelledby="editPackageModalLabel_PK004" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPackageModalLabel_PK004">Chỉnh Sửa Gói Dịch Vụ PK004</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/packages/edit/PK004" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Mã Gói</label>
+                        <input type="text" class="form-control" name="code" value="PK004" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tên Gói</label>
+                        <input type="text" class="form-control" name="name" value="Gói Premium" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá (VNĐ)</label>
+                        <input type="text" class="form-control" name="price" value="999000" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời Hạn</label>
+                        <input type="text" class="form-control" name="duration" value="30 ngày" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tính Năng Chính</label>
+                        <textarea class="form-control" name="features" required>Quản lý 5,000 đơn hàng/tháng, Tích hợp không giới hạn nền tảng, Hỗ trợ 24/7 + quản lý tài khoản riêng, Báo cáo tùy chỉnh, Phân tích doanh thu chuyên sâu, Quản lý kho + vận chuyển, Ưu tiên xử lý dữ liệu</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="active" selected>Hoạt động</option>
+                            <option value="hidden">Ẩn</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa Gói Dịch Vụ (PK005 - Enterprise) -->
+<div class="modal fade" id="editPackageModal_PK005" tabindex="-1" aria-labelledby="editPackageModalLabel_PK005" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPackageModalLabel_PK005">Chỉnh Sửa Gói Dịch Vụ PK005</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/packages/edit/PK005" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Mã Gói</label>
+                        <input type="text" class="form-control" name="code" value="PK005" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tên Gói</label>
+                        <input type="text" class="form-control" name="name" value="Gói Enterprise" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá (VNĐ)</label>
+                        <input type="text" class="form-control" name="price" value="Liên hệ" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời Hạn</label>
+                        <input type="text" class="form-control" name="duration" value="Tùy chỉnh" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tính Năng Chính</label>
+                        <textarea class="form-control" name="features" required>Quản lý không giới hạn đơn hàng, Tích hợp không giới hạn nền tảng, Hỗ trợ 24/7 + đội ngũ chuyên gia, Báo cáo tùy chỉnh toàn diện, Phân tích AI dự đoán doanh thu, Quản lý kho + vận chuyển nâng cao, Tùy chỉnh hệ thống theo yêu cầu, Server riêng biệt</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="active">Hoạt động</option>
+                            <option value="hidden" selected>Ẩn</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa Gói Dịch Vụ (PK001 - Starter) -->
+<div class="modal fade" id="deletePackageModal_PK001" tabindex="-1" aria-labelledby="deletePackageModalLabel_PK001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePackageModalLabel_PK001">Xóa Gói Dịch Vụ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa gói dịch vụ <strong>Gói Starter (PK001)</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/packages/delete/PK001" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa Gói Dịch Vụ (PK002 - Basic) -->
+<div class="modal fade" id="deletePackageModal_PK002" tabindex="-1" aria-labelledby="deletePackageModalLabel_PK002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePackageModalLabel_PK002">Xóa Gói Dịch Vụ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa gói dịch vụ <strong>Gói Basic (PK002)</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/packages/delete/PK002" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa Gói Dịch Vụ (PK003 - Pro) -->
+<div class="modal fade" id="deletePackageModal_PK003" tabindex="-1" aria-labelledby="deletePackageModalLabel_PK003" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePackageModalLabel_PK003">Xóa Gói Dịch Vụ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa gói dịch vụ <strong>Gói Pro (PK003)</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/packages/delete/PK003" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa Gói Dịch Vụ (PK004 - Premium) -->
+<div class="modal fade" id="deletePackageModal_PK004" tabindex="-1" aria-labelledby="deletePackageModalLabel_PK004" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePackageModalLabel_PK004">Xóa Gói Dịch Vụ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa gói dịch vụ <strong>Gói Premium (PK004)</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/packages/delete/PK004" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa Gói Dịch Vụ (PK005 - Enterprise) -->
+<div class="modal fade" id="deletePackageModal_PK005" tabindex="-1" aria-labelledby="deletePackageModalLabel_PK005" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePackageModalLabel_PK005">Xóa Gói Dịch Vụ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa gói dịch vụ <strong>Gói Enterprise (PK005)</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/packages/delete/PK005" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+      <!-- ----------------------------------Section: Mã Giảm Giá------------------------------ -->
+<div class="section" id="coupons">
+    <h2 class="mb-4">Mã Giảm Giá</h2>
+    <div class="filter-bar d-flex flex-wrap gap-3">
+        <div class="flex-grow-1">
+            <label class="form-label">Tìm kiếm</label>
+            <form action="/coupons/search" method="GET">
+                <input type="text" class="form-control" name="search" placeholder="Mã giảm giá..." />
+            </form>
+        </div>
+        <div>
+            <label class="form-label">Trạng thái</label>
+            <form action="/coupons/filter" method="GET">
+                <select class="form-select" name="status">
+                    <option value="">Tất cả</option>
+                    <option value="active">Hoạt động</option>
+                    <option value="expired">Hết hạn</option>
+                </select>
+            </form>
+        </div>
+        <div class="align-self-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">Thêm Mã</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Giảm Giá</th>
+                    <th>Hạn Sử Dụng</th>
+                    <th>Số Lần Dùng</th>
+                    <th>Gói Áp Dụng</th>
+                    <th>Mô Tả</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>DISCOUNT10</td>
+                    <td>10%</td>
+                    <td>30/04/2025</td>
+                    <td>50</td>
+                    <td>Gói Cơ Bản, Gói Pro</td>
+                    <td>Giảm giá cho gói Cơ Bản và Pro</td>
+                    <td><span class="badge bg-success">Hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewCouponModal_DISCOUNT10"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editCouponModal_DISCOUNT10"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCouponModal_DISCOUNT10"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>SALE2025</td>
+                    <td>200,000 VNĐ</td>
+                    <td>10/04/2025</td>
+                    <td>20</td>
+                    <td>Gói Pro</td>
+                    <td>Giảm giá đặc biệt cho gói Pro</td>
+                    <td><span class="badge bg-danger">Hết hạn</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewCouponModal_SALE2025"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editCouponModal_SALE2025"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCouponModal_SALE2025"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm Mã Giảm Giá -->
+<div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="addCouponModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCouponModalLabel">Thêm Mã Giảm Giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/coupons/add" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Mã Giảm Giá</label>
+                        <input type="text" class="form-control" name="code" placeholder="Nhập mã giảm giá" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Loại Giảm Giá</label>
+                        <select class="form-select" name="discount_type" required>
+                            <option value="percentage">Phần trăm (%)</option>
+                            <option value="fixed">Số tiền cố định (VNĐ)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá Trị Giảm</label>
+                        <input type="number" class="form-control" name="discount_value" placeholder="Nhập giá trị" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hạn Sử Dụng</label>
+                        <input type="date" class="form-control" name="expiry_date" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số Lần Dùng Tối Đa</label>
+                        <input type="number" class="form-control" name="max_uses" placeholder="Nhập số lần" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gói Áp Dụng</label>
+                        <select class="form-select" name="applicable_packages[]" multiple required>
+                            <option value="PK001">Gói Cơ Bản</option>
+                            <option value="PK002">Gói Pro</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô Tả</label>
+                        <textarea class="form-control" name="description" placeholder="Nhập mô tả (tùy chọn)"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="active">Hoạt động</option>
+                            <option value="expired">Hết hạn</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Mã Giảm Giá (DISCOUNT10) -->
+<div class="modal fade" id="viewCouponModal_DISCOUNT10" tabindex="-1" aria-labelledby="viewCouponModalLabel_DISCOUNT10" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewCouponModalLabel_DISCOUNT10">Chi Tiết Mã Giảm Giá DISCOUNT10</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã:</strong> DISCOUNT10</p>
+                <p><strong>Giảm Giá:</strong> 10%</p>
+                <p><strong>Hạn Sử Dụng:</strong> 30/04/2025</p>
+                <p><strong>Số Lần Dùng:</strong> 50</p>
+                <p><strong>Gói Áp Dụng:</strong> Gói Cơ Bản, Gói Pro</p>
+                <p><strong>Mô Tả:</strong> Giảm giá cho gói Cơ Bản và Pro</p>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Mã Giảm Giá (SALE2025) -->
+<div class="modal fade" id="viewCouponModal_SALE2025" tabindex="-1" aria-labelledby="viewCouponModalLabel_SALE2025" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewCouponModalLabel_SALE2025">Chi Tiết Mã Giảm Giá SALE2025</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã:</strong> SALE2025</p>
+                <p><strong>Giảm Giá:</strong> 200,000 VNĐ</p>
+                <p><strong>Hạn Sử Dụng:</strong> 10/04/2025</p>
+                <p><strong>Số Lần Dùng:</strong> 20</p>
+                <p><strong>Gói Áp Dụng:</strong> Gói Pro</p>
+                <p><strong>Mô Tả:</strong> Giảm giá đặc biệt cho gói Pro</p>
+                <p><strong>Trạng Thái:</strong> Hết hạn</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa Mã Giảm Giá (DISCOUNT10) -->
+<div class="modal fade" id="editCouponModal_DISCOUNT10" tabindex="-1" aria-labelledby="editCouponModalLabel_DISCOUNT10" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCouponModalLabel_DISCOUNT10">Chỉnh Sửa Mã Giảm Giá DISCOUNT10</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/coupons/edit/DISCOUNT10" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Mã Giảm Giá</label>
+                        <input type="text" class="form-control" name="code" value="DISCOUNT10" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Loại Giảm Giá</label>
+                        <select class="form-select" name="discount_type" required>
+                            <option value="percentage" selected>Phần trăm (%)</option>
+                            <option value="fixed">Số tiền cố định (VNĐ)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá Trị Giảm</label>
+                        <input type="number" class="form-control" name="discount_value" value="10" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hạn Sử Dụng</label>
+                        <input type="date" class="form-control" name="expiry_date" value="2025-04-30" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số Lần Dùng Tối Đa</label>
+                        <input type="number" class="form-control" name="max_uses" value="50" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gói Áp Dụng</label>
+                        <select class="form-select" name="applicable_packages[]" multiple required>
+                            <option value="PK001" selected>Gói Cơ Bản</option>
+                            <option value="PK002" selected>Gói Pro</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô Tả</label>
+                        <textarea class="form-control" name="description">Giảm giá cho gói Cơ Bản và Pro</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="active" selected>Hoạt động</option>
+                            <option value="expired">Hết hạn</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa Mã Giảm Giá (SALE2025) -->
+<div class="modal fade" id="editCouponModal_SALE2025" tabindex="-1" aria-labelledby="editCouponModalLabel_SALE2025" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCouponModalLabel_SALE2025">Chỉnh Sửa Mã Giảm Giá SALE2025</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/coupons/edit/SALE2025" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Mã Giảm Giá</label>
+                        <input type="text" class="form-control" name="code" value="SALE2025" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Loại Giảm Giá</label>
+                        <select class="form-select" name="discount_type" required>
+                            <option value="percentage">Phần trăm (%)</option>
+                            <option value="fixed" selected>Số tiền cố định (VNĐ)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá Trị Giảm</label>
+                        <input type="number" class="form-control" name="discount_value" value="200000" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hạn Sử Dụng</label>
+                        <input type="date" class="form-control" name="expiry_date" value="2025-04-10" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số Lần Dùng Tối Đa</label>
+                        <input type="number" class="form-control" name="max_uses" value="20" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gói Áp Dụng</label>
+                        <select class="form-select" name="applicable_packages[]" multiple required>
+                            <option value="PK001">Gói Cơ Bản</option>
+                            <option value="PK002" selected>Gói Pro</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô Tả</label>
+                        <textarea class="form-control" name="description">Giảm giá đặc biệt cho gói Pro</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="active">Hoạt động</option>
+                            <option value="expired" selected>Hết hạn</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa Mã Giảm Giá (DISCOUNT10) -->
+<div class="modal fade" id="deleteCouponModal_DISCOUNT10" tabindex="-1" aria-labelledby="deleteCouponModalLabel_DISCOUNT10" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCouponModalLabel_DISCOUNT10">Xóa Mã Giảm Giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa mã giảm giá <strong>DISCOUNT10</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/coupons/delete/DISCOUNT10" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa Mã Giảm Giá (SALE2025) -->
+<div class="modal fade" id="deleteCouponModal_SALE2025" tabindex="-1" aria-labelledby="deleteCouponModalLabel_SALE2025" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCouponModalLabel_SALE2025">Xóa Mã Giảm Giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa mã giảm giá <strong>SALE2025</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/coupons/delete/SALE2025" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!------------------------------ Section: Quản Lý Bài Viết ------------------------------->
+<div class="section" id="posts">
+    <h2 class="mb-4">Quản Lý Bài Viết</h2>
+    <div class="filter-bar d-flex flex-wrap gap-3">
+        <div class="flex-grow-1">
+            <label class="form-label">Tìm kiếm</label>
+            <input type="text" class="form-control" placeholder="Tiêu đề, tác giả..." />
+        </div>
+        <div>
+            <label class="form-label">Trạng thái</label>
+            <select class="form-select">
+                <option>Tất cả (150)</option>
+                <option>Đã đăng (120)</option>
+                <option>Bản nháp (30)</option>
+            </select>
+        </div>
+        <div class="align-self-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPostModal">Thêm Bài Viết</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tiêu Đề</th>
+                    <th>Tác Giả</th>
+                    <th>Ngày Đăng</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#001</td>
+                    <td>Hướng dẫn sử dụng</td>
+                    <td>Admin A</td>
+                    <td>10/04/2025</td>
+                    <td><span class="badge bg-success">Đã đăng</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewPostModal_001"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editPostModal_001"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePostModal_001"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>#002</td>
+                    <td>Tin tức mới</td>
+                    <td>Admin B</td>
+                    <td>-</td>
+                    <td><span class="badge bg-warning">Bản nháp</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewPostModal_002"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editPostModal_002"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePostModal_002"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Thêm Bài Viết -->
+<div class="modal fade" id="addPostModal" tabindex="-1" aria-labelledby="addPostModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPostModalLabel">Thêm Bài Viết</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/posts/add" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">ID</label>
+                        <input type="text" class="form-control" name="id" placeholder="Nhập ID (VD: #003)" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tiêu Đề</label>
+                        <input type="text" class="form-control" name="title" placeholder="Nhập tiêu đề" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tác Giả</label>
+                        <input type="text" class="form-control" name="author" placeholder="Nhập tên tác giả" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ngày Đăng</label>
+                        <input type="date" class="form-control" name="date" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nội Dung</label>
+                        <textarea class="form-control" name="content" rows="5" placeholder="Nhập nội dung bài viết" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Từ Khóa SEO</label>
+                        <input type="text" class="form-control" name="keywords" placeholder="Nhập từ khóa, cách nhau bằng dấu phẩy (VD: hướng dẫn, sử dụng, tutorial)" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="published">Đã đăng</option>
+                            <option value="draft">Bản nháp</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Bài Viết (#001) -->
+<div class="modal fade" id="viewPostModal_001" tabindex="-1" aria-labelledby="viewPostModalLabel_001" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewPostModalLabel_001">Chi Tiết Bài Viết #001</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> #001</p>
+                <p><strong>Tiêu Đề:</strong> Hướng dẫn sử dụng</p>
+                <p><strong>Tác Giả:</strong> Admin A</p>
+                <p><strong>Ngày Đăng:</strong> 10/04/2025</p>
+                <p><strong>Nội Dung:</strong> Đây là hướng dẫn sử dụng hệ thống quản trị dành cho người dùng mới.</p>
+                <p><strong>Từ Khóa SEO:</strong> hướng dẫn, sử dụng, tutorial, quản trị</p>
+                <p><strong>Trạng Thái:</strong> Đã đăng</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem Bài Viết (#002) -->
+<div class="modal fade" id="viewPostModal_002" tabindex="-1" aria-labelledby="viewPostModalLabel_002" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewPostModalLabel_002">Chi Tiết Bài Viết #002</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> #002</p>
+                <p><strong>Tiêu Đề:</strong> Tin tức mới</p>
+                <p><strong>Tác Giả:</strong> Admin B</p>
+                <p><strong>Ngày Đăng:</strong> -</p>
+                <p><strong>Nội Dung:</strong> Bản tin cập nhật các tính năng mới của hệ thống trong tháng này.</p>
+                <p><strong>Từ Khóa SEO:</strong> tin tức, cập nhật, hệ thống, mới</p>
+                <p><strong>Trạng Thái:</strong> Bản nháp</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa Bài Viết (#001) -->
+<div class="modal fade" id="editPostModal_001" tabindex="-1" aria-labelledby="editPostModalLabel_001" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPostModalLabel_001">Chỉnh Sửa Bài Viết #001</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/posts/edit/001" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">ID</label>
+                        <input type="text" class="form-control" name="id" value="#001" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tiêu Đề</label>
+                        <input type="text" class="form-control" name="title" value="Hướng dẫn sử dụng" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tác Giả</label>
+                        <input type="text" class="form-control" name="author" value="Admin A" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ngày Đăng</label>
+                        <input type="date" class="form-control" name="date" value="2025-04-10" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nội Dung</label>
+                        <textarea class="form-control" name="content" rows="5" required>Đây là hướng dẫn sử dụng hệ thống quản trị dành cho người dùng mới.</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Từ Khóa SEO</label>
+                        <input type="text" class="form-control" name="keywords" value="hướng dẫn, sử dụng, tutorial, quản trị" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="published" selected>Đã đăng</option>
+                            <option value="draft">Bản nháp</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chỉnh Sửa Bài Viết (#002) -->
+<div class="modal fade" id="editPostModal_002" tabindex="-1" aria-labelledby="editPostModalLabel_002" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPostModalLabel_002">Chỉnh Sửa Bài Viết #002</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/posts/edit/002" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">ID</label>
+                        <input type="text" class="form-control" name="id" value="#002" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tiêu Đề</label>
+                        <input type="text" class="form-control" name="title" value="Tin tức mới" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tác Giả</label>
+                        <input type="text" class="form-control" name="author" value="Admin B" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ngày Đăng</label>
+                        <input type="date" class="form-control" name="date" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nội Dung</label>
+                        <textarea class="form-control" name="content" rows="5" required>Bản tin cập nhật các tính năng mới của hệ thống trong tháng này.</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Từ Khóa SEO</label>
+                        <input type="text" class="form-control" name="keywords" value="tin tức, cập nhật, hệ thống, mới" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Trạng Thái</label>
+                        <select class="form-select" name="status" required>
+                            <option value="published">Đã đăng</option>
+                            <option value="draft" selected>Bản nháp</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa Bài Viết (#001) -->
+<div class="modal fade" id="deletePostModal_001" tabindex="-1" aria-labelledby="deletePostModalLabel_001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePostModalLabel_001">Xóa Bài Viết</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa bài viết <strong>Hướng dẫn sử dụng (#001)</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/posts/delete/001" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xóa Bài Viết (#002) -->
+<div class="modal fade" id="deletePostModal_002" tabindex="-1" aria-labelledby="deletePostModalLabel_002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePostModalLabel_002">Xóa Bài Viết</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa bài viết <strong>Tin tức mới (#002)</strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <form action="/posts/delete/002" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+   
+<!------------------------------ Section: Cài Đặt ------------------------------->
+<div class="section" id="settings">
+    <h2 class="mb-4">Cài Đặt</h2>
+
+    <!-- Cài Đặt: Thông Tin Hệ Thống -->
+    <div class="settings-card mb-4">
+        <h3 class="mb-4">Thông Tin Hệ Thống</h3>
+        <form action="/settings/system" method="POST">
+            <div class="mb-3">
+                <label class="form-label">Tên Website</label>
+                <input type="text" class="form-control" name="website_name" value="Easy Sell" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email Hỗ Trợ</label>
+                <input type="email" class="form-control" name="support_email" value="htu25578@gmaol.com" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Số Điện Thoại Hỗ Trợ</label>
+                <input type="tel" class="form-control" name="support_phone" value="0336141436" pattern="[0-9]{4}-[0-9]{3}-[0-9]{3}" placeholder="VD: 0123-456-789" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">URL Website</label>
+                <input type="url" class="form-control" name="website_url" value="www.easysell.vn" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mô Tả Website</label>
+                <textarea class="form-control" name="website_description" rows="3">Hệ thống quản trị Easy Sell giúp quản lý tài khoản, gói dịch vụ và bài viết hiệu quả.</textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="button" class="btn btn-secondary">Hủy</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Cài Đặt: Giao Diện -->
+    <div class="settings-card mb-4">
+        <h3 class="mb-4">Cài Đặt Giao Diện</h3>
+        <form action="/settings/theme" method="POST">
+            <div class="mb-3">
+                <label class="form-label">Màu Chủ Đạo</label>
+                <input type="color" class="form-control form-control-color" name="primary_color" value="#108AB1" title="Chọn màu chủ đạo" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Logo Website</label>
+                <input type="file" class="form-control" name="logo" accept="image/*" />
+                <small class="form-text text-muted">Kích thước đề nghị: 200x50px, định dạng PNG/JPG.</small>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Chế Độ Giao Diện</label>
+                <select class="form-select" name="theme_mode">
+                    <option value="light" selected>Sáng</option>
+                    <option value="dark">Tối</option>
+                    <option value="auto">Tự động (theo hệ thống)</option>
+                </select>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="button" class="btn btn-secondary">Hủy</button>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- Cài Đặt: SEO -->
+    <div class="settings-card mb-4">
+        <h3 class="mb-4">Cài Đặt SEO</h3>
+        <form action="/settings/seo" method="POST">
+            <div class="mb-3">
+                <label class="form-label">Tiêu Đề SEO Mặc Định</label>
+                <input type="text" class="form-control" name="seo_title" value="Super Admin Panel - Quản Lý Hiệu Quả" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Mô Tả SEO Mặc Định</label>
+                <textarea class="form-control" name="seo_description" rows="3">Hệ thống quản trị Super Admin Panel giúp quản lý tài khoản, gói dịch vụ và bài viết một cách hiệu quả.</textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Từ Khóa SEO Mặc Định</label>
+                <input type="text" class="form-control" name="seo_keywords" value="quản trị, admin, hệ thống, hiệu quả" placeholder="Nhập từ khóa, cách nhau bằng dấu phẩy" />
+            </div>
+            <div class="mb-3">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" name="seo_index" checked /> Cho phép công cụ tìm kiếm lập chỉ mục
+                </label>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="button" class="btn btn-secondary">Hủy</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Cài Đặt: Bảo Mật -->
+    <div class="settings-card mb-4">
+        <h3 class="mb-4">Cài Đặt Bảo Mật</h3>
+        <form action="/settings/security" method="POST">
+            <div class="mb-3">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" name="two_factor_auth" /> Bật xác thực hai yếu tố (2FA)
+                </label>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Thời Gian Hết Phiên Đăng Nhập (phút)</label>
+                <input type="number" class="form-control" name="session_timeout" value="30" min="5" max="1440" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Số Lần Đăng Nhập Sai Tối Đa</label>
+                <input type="number" class="form-control" name="max_login_attempts" value="5" min="1" max="10" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Thời Gian Khóa Tài Khoản (phút)</label>
+                <input type="number" class="form-control" name="lockout_time" value="15" min="1" max="60" />
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button type="button" class="btn btn-secondary">Hủy</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script>
+        // DOM Elements
+        const toggleBtn = document.getElementById('toggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarLinks = document.querySelectorAll('.sidebar a[data-section]');
+        const sections = document.querySelectorAll('.section');
+
+        // Hàm định dạng ngày giờ
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            const formattedDateTime = now.toLocaleString('vi-VN', options).replace(',', '');
+            document.getElementById('currentDateTime').textContent = formattedDateTime;
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Sidebar Toggle
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Section Navigation
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                sidebarLinks.forEach(l => l.classList.remove('active'));
+                sections.forEach(s => s.classList.remove('active'));
+                link.classList.add('active');
+                document.getElementById(sectionId).classList.add('active');
+                if (window.innerWidth <= 768) sidebar.classList.remove('active');
+            });
+        });
+
+        // Chart Configuration
+        const chartConfig = {
+            accountChart: {
+                ctx: document.getElementById('accountChart').getContext('2d'),
+                type: 'line',
+                data: {
+                    labels: ['Th1', 'Th2', 'Th3', 'Th4'],
+                    datasets: [{
+                        label: 'Tài Khoản Mới',
+                        data: [50, 70, 90, 120],
+                        borderColor: '#108AB1',
+                        backgroundColor: 'rgba(16, 138, 177, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            },
+            packageChart: {
+                ctx: document.getElementById('packageChart').getContext('2d'),
+                type: 'doughnut',
+                data: {
+                    labels: ['Gói Cơ Bản', 'Gói Nâng Cao', 'Gói Pro'],
+                    datasets: [{ data: [150, 100, 70], backgroundColor: ['#22c55e', '#facc15', '#108AB1'] }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            }
+        };
+
+        Object.keys(chartConfig).forEach(chartId => {
+            const config = chartConfig[chartId];
+            new Chart(config.ctx, { type: config.type, data: config.data, options: config.options });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2863 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý - User</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="shortcut icon" href="/img/favicon-16x16.png" type="image/x-icon">
+    <style>
+        :root {
+            --primary-color: #108AB1;
+            --secondary-color: #0d6f8f;
+            --shadow-light: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: var(--primary-color);
+            padding-top: 20px;
+            transition: 0.3s ease;
+            z-index: 1000;
+        }
+        .sidebar .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            color: white;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: var(--secondary-color);
+        }
+        .sidebar a i {
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: 0.3s ease;
+            min-height: 100vh;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+
+        /* Navbar Top */
+        .navbar-top {
+            background-color: #fff;
+            padding: 15px 20px;
+            box-shadow: var(--shadow-light);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        .navbar-top .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Cards */
+        .stat-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: var(--shadow-light);
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Table */
+        .table {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: var(--shadow-light);
+        }
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-light);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-light);
+            margin-bottom: 20px;
+        }
+
+        /* Modal */
+        .modal-header.bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+        .modal-header.bg-danger {
+            background-color: #dc3545 !important;
+        }
+
+        /* DateTime */
+        #currentDateTime {
+            font-size: 14px;
+            color: #555;
+            background-color: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* Responsive */
+        .sidebar-toggle {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .sidebar.active {
+                width: 250px;
+            }
+            .sidebar-toggle {
+                display: block;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-bar .d-flex {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .filter-bar .align-self-end {
+                margin-top: 10px;
+                align-self: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="logo">
+            <h4 class="text-white">Quản Lý</h4>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="dashboard"><i class="bi bi-house"></i> Tổng Quan</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link active" data-section="products"><i class="bi bi-box"></i> Sản Phẩm</a>
+                <ul class="nav flex-column ps-4" id="productSubMenu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="productList"><i class="bi bi-list"></i> Danh Sách Sản Phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="categories"><i class="bi bi-tags"></i> Danh Mục</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="brands"><i class="bi bi-bookmark"></i> Nhãn Hiệu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="taxes"><i class="bi bi-calculator"></i> Thuế</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-section="units"><i class="bi bi-rulers"></i> Đơn Vị</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="orders"><i class="bi bi-cart"></i> Đơn Hàng</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="returns"><i class="bi bi-arrow-return-left"></i> Trả Hàng</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-section="settings"><i class="bi bi-gear"></i> Cài Đặt</a>
+            </li>
+            <li class="nav-item">
+                <a href="/auth/dangnhap.html"><i class="bi bi-box-arrow-right"></i> Đăng Xuất</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="navbar-top d-flex justify-content-between align-items-center">
+            <button id="toggleBtn" class="btn btn-primary sidebar-toggle"><i class="bi bi-list"></i></button>
+            <div class="user-info d-flex align-items-center">
+                <span id="currentDateTime"></span>
+            </div>
+        </div>
+
+        <!-- Section: Tổng Quan -->
+        <div class="section" id="dashboard">
+            <h2 class="mb-4">Tổng Quan</h2>
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stat-card text-center">
+                        <i class="bi bi-cart text-primary fs-2 mb-2"></i>
+                        <h5>Tổng Đơn Hàng</h5>
+                        <p class="fw-bold">1,234</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card text-center">
+                        <i class="bi bi-currency-dollar text-success fs-2 mb-2"></i>
+                        <h5>Doanh Thu</h5>
+                        <p class="fw-bold">499,000,000 VNĐ</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card text-center">
+                        <i class="bi bi-box-seam text-warning fs-2 mb-2"></i>
+                        <h5>Sản Phẩm</h5>
+                        <p class="fw-bold">567</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card text-center">
+                        <i class="bi bi-arrow-return-left text-danger fs-2 mb-2"></i>
+                        <h5>Trả Hàng</h5>
+                        <p class="fw-bold">89</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5>Doanh Thu Tháng</h5>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5>Trạng Thái Đơn Hàng</h5>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Danh Sách Sản Phẩm -->
+        <div class="section active" id="productList">
+            <h2 class="mb-4">Danh Sách Sản Phẩm</h2>
+            <div class="filter-bar d-flex flex-wrap justify-content-between gap-3">
+                <div class="d-flex flex-wrap gap-3">
+                    <div style="min-width: 200px;">
+                        <label class="form-label fw-bold">Tìm kiếm</label>
+                        <input type="text" class="form-control" placeholder="Tên, mã sản phẩm..." />
+                    </div>
+                    <div style="min-width: 150px;">
+                        <label class="form-label fw-bold">Danh mục</label>
+                        <select class="form-select">
+                            <option value="">Tất cả</option>
+                            <option value="Điện tử">Điện tử</option>
+                            <option value="Thời trang">Thời trang</option>
+                        </select>
+                    </div>
+                    <div style="min-width: 150px;">
+                        <label class="form-label fw-bold">Trạng Thái</label>
+                        <select class="form-select">
+                            <option value="">Tất cả</option>
+                            <option value="Còn hàng">Còn hàng</option>
+                            <option value="Hết hàng">Hết hàng</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="align-self-end">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal"><i class="bi bi-plus-circle me-1"></i> Thêm Sản Phẩm</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Mã SP</th>
+                            <th>Tên</th>
+                            <th>Danh Mục</th>
+                            <th>Số Lượng</th>
+                            <th>Giá Bán</th>
+                            <th>Trạng Thái</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SP001</td>
+                            <td>Điện thoại X</td>
+                            <td>Điện tử</td>
+                            <td>100</td>
+                            <td>500,000 VNĐ</td>
+                            <td><span class="badge bg-success">Còn hàng</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewProductModal001"><i class="bi bi-eye"></i></button>
+                                <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editProductModal001"><i class="bi bi-pencil-square"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteProductModal001"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SP002</td>
+                            <td>Áo thun Y</td>
+                            <td>Thời trang</td>
+                            <td>50</td>
+                            <td>200,000 VNĐ</td>
+                            <td><span class="badge bg-success">Còn hàng</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewProductModal002"><i class="bi bi-eye"></i></button>
+                                <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editProductModal002"><i class="bi bi-pencil-square"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteProductModal002"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+ <!-- Modal: Thêm Sản Phẩm -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addProductModalLabel">Thêm Sản Phẩm</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addProductForm">
+                    <div class="row">
+                        <!-- Cột thông tin sản phẩm -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Sản Phẩm</label>
+                                <input type="text" name="code" class="form-control" placeholder="VD: SP003" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tên Sản Phẩm</label>
+                                <input type="text" name="name" class="form-control" placeholder="Nhập tên sản phẩm" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Danh Mục</label>
+                                <select name="category" class="form-select" required>
+                                    <option value="" disabled selected>Chọn danh mục</option>
+                                    <option value="Điện tử">Điện tử</option>
+                                    <option value="Thời trang">Thời trang</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nhãn Hiệu</label>
+                                <select name="brand" class="form-select" required>
+                                    <option value="" disabled selected>Chọn nhãn hiệu</option>
+                                    <option value="Samsung">Samsung</option>
+                                    <option value="Nike">Nike</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Thuế</label>
+                                <select name="tax" class="form-select" required>
+                                    <option value="" disabled selected>Chọn thuế</option>
+                                    <option value="VAT 10%">VAT 10%</option>
+                                    <option value="VAT 8%">VAT 8%</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Đơn Vị</label>
+                                <select name="unit" class="form-select" required>
+                                    <option value="" disabled selected>Chọn đơn vị</option>
+                                    <option value="Cái">Cái</option>
+                                    <option value="Bộ">Bộ</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Số Lượng</label>
+                                <input type="number" name="quantity" class="form-control" min="0" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Giá Bán</label>
+                                <input type="text" name="price" class="form-control" placeholder="VD: 500,000 VNĐ" required pattern="[0-9,]+ VNĐ" />
+                            </div>
+                        </div>
+                        <!-- Cột tải ảnh -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ảnh Sản Phẩm</label>
+                                <input type="file" name="image" class="form-control" accept="image/*" />
+                            </div>
+                            <div class="mb-3 text-center">
+                                <img id="imagePreview" src="#" alt="Ảnh xem trước" style="max-width: 100%; max-height: 200px; display: none;" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="addProductForm" class="btn btn-success">Thêm</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal: Xem Sản Phẩm SP001 -->
+<div class="modal fade" id="viewProductModal001" tabindex="-1" aria-labelledby="viewProductModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewProductModalLabel001">Chi Tiết Sản Phẩm SP001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Sản Phẩm:</strong> SP001</p>
+                <p><strong>Tên:</strong> Điện thoại X</p>
+                <p><strong>Danh Mục:</strong> Điện tử</p>
+                <p><strong>Số Lượng:</strong> 100</p>
+                <p><strong>Giá Bán:</strong> 500,000 VNĐ</p>
+                <p><strong>Trạng Thái:</strong> Còn hàng</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Sản Phẩm SP001 -->
+<div class="modal fade" id="editProductModal001" tabindex="-1" aria-labelledby="editProductModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editProductModalLabel001">Chỉnh Sửa Sản Phẩm SP001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên Sản Phẩm</label>
+                        <input type="text" class="form-control" value="Điện thoại X" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Danh Mục</label>
+                        <select class="form-select" required>
+                            <option value="Điện tử" selected>Điện tử</option>
+                            <option value="Thời trang">Thời trang</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Số Lượng</label>
+                        <input type="number" class="form-control" value="100" min="0" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Giá Bán</label>
+                        <input type="text" class="form-control" value="500,000 VNĐ" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Sản Phẩm SP001 -->
+<div class="modal fade" id="deleteProductModal001" tabindex="-1" aria-labelledby="deleteProductModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteProductModalLabel001">Xóa Sản Phẩm SP001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa sản phẩm <strong>Điện thoại X (SP001)</strong>?</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Sản Phẩm SP002 -->
+<div class="modal fade" id="viewProductModal002" tabindex="-1" aria-labelledby="viewProductModalLabel002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewProductModalLabel002">Chi Tiết Sản Phẩm SP002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Sản Phẩm:</strong> SP002</p>
+                <p><strong>Tên:</strong> Áo thun Y</p>
+                <p><strong>Danh Mục:</strong> Thời trang</p>
+                <p><strong>Số Lượng:</strong> 50</p>
+                <p><strong>Giá Bán:</strong> 200,000 VNĐ</p>
+                <p><strong>Trạng Thái:</strong> Còn hàng</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+       <!-- Modal: Sửa Sản Phẩm SP002 -->
+       <div class="modal fade" id="editProductModal002" tabindex="-1" aria-labelledby="editProductModalLabel002" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editProductModalLabel002">Chỉnh Sửa Sản Phẩm SP002</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên Sản Phẩm</label>
+                            <input type="text" class="form-control" value="Áo thun Y" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Danh Mục</label>
+                            <select class="form-select" required>
+                                <option value="Điện tử">Điện tử</option>
+                                <option value="Thời trang" selected>Thời trang</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Số Lượng</label>
+                            <input type="number" class="form-control" value="50" min="0" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Giá Bán</label>
+                            <input type="text" class="form-control" value="200,000 VNĐ" required />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Xóa Sản Phẩm SP002 -->
+    <div class="modal fade" id="deleteProductModal002" tabindex="-1" aria-labelledby="deleteProductModalLabel002" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteProductModalLabel002">Xóa Sản Phẩm SP002</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn xóa sản phẩm <strong>Áo thun Y (SP002)</strong>?</p>
+                    <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger">Xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!---------------------------------- Section: Danh Mục --------------------------->
+        <div class="section" id="categories">
+            <h2 class="mb-4">Danh Mục</h2>
+            <div class="d-flex justify-content-end mb-4">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal"><i class="bi bi-plus-circle me-1"></i> Thêm Danh Mục</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Mã DM</th>
+                            <th>Tên Danh Mục</th>
+                            <th>Mô Tả</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>DM001</td>
+                            <td>Điện tử</td>
+                            <td>Sản phẩm công nghệ</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editCategoryModal001"><i class="bi bi-pencil-square"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal001"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>DM002</td>
+                            <td>Thời trang</td>
+                            <td>Quần áo, phụ kiện</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editCategoryModal002"><i class="bi bi-pencil-square"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal002"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+            <!-- Modal: Thêm Danh Mục -->
+            <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="addCategoryModalLabel">Thêm Danh Mục</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Mã Danh Mục</label>
+                                    <input type="text" class="form-control" placeholder="VD: DM003" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Tên Danh Mục</label>
+                                    <input type="text" class="form-control" placeholder="Nhập tên danh mục" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Mô Tả</label>
+                                    <textarea class="form-control" rows="3" placeholder="Mô tả danh mục"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-success">Thêm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Modal: Sửa Danh Mục DM001 -->
+            <div class="modal fade" id="editCategoryModal001" tabindex="-1" aria-labelledby="editCategoryModalLabel001" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="editCategoryModalLabel001">Chỉnh Sửa Danh Mục DM001</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Tên Danh Mục</label>
+                                    <input type="text" class="form-control" value="Điện tử" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Mô Tả</label>
+                                    <textarea class="form-control" rows="3">Sản phẩm công nghệ</textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-primary">Lưu</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Modal: Xóa Danh Mục DM001 -->
+            <div class="modal fade" id="deleteCategoryModal001" tabindex="-1" aria-labelledby="deleteCategoryModalLabel001" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="deleteCategoryModalLabel001">Xóa Danh Mục DM001</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Bạn có chắc chắn muốn xóa danh mục <strong>Điện tử (DM001)</strong>?</p>
+                            <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-danger">Xóa</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Modal: Sửa Danh Mục DM002 -->
+            <div class="modal fade" id="editCategoryModal002" tabindex="-1" aria-labelledby="editCategoryModalLabel002" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="editCategoryModalLabel002">Chỉnh Sửa Danh Mục DM002</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Tên Danh Mục</label>
+                                    <input type="text" class="form-control" value="Thời trang" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Mô Tả</label>
+                                    <textarea class="form-control" rows="3">Quần áo, phụ kiện</textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-primary">Lưu</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Modal: Xóa Danh Mục DM002 -->
+            <div class="modal fade" id="deleteCategoryModal002" tabindex="-1" aria-labelledby="deleteCategoryModalLabel002" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="deleteCategoryModalLabel002">Xóa Danh Mục DM002</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Bạn có chắc chắn muốn xóa danh mục <strong>Thời trang (DM002)</strong>?</p>
+                            <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-danger">Xóa</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+ <!-- Section: Nhãn Hiệu -->
+<div class="section" id="brands">
+    <h2 class="mb-4">Nhãn Hiệu</h2>
+    <div class="filter-bar d-flex flex-wrap justify-content-between gap-3 mb-4">
+        <div class="d-flex flex-wrap gap-3">
+            <div style="min-width: 200px;">
+                <label class="form-label fw-bold">Tìm kiếm</label>
+                <input type="text" class="form-control" placeholder="Tên, mã nhãn hiệu..." />
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Trạng Thái</label>
+                <select class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="Hoạt động">Hoạt động</option>
+                    <option value="Không hoạt động">Không hoạt động</option>
+                </select>
+            </div>
+        </div>
+        <div class="align-self-end">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addBrandModal"><i class="bi bi-plus-circle me-1"></i> Thêm Nhãn Hiệu</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Mã NH</th>
+                    <th>Tên Nhãn Hiệu</th>
+                    <th>Logo</th>
+                    <th>Mô Tả</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>NH001</td>
+                    <td>Samsung</td>
+                    <td><img src="https://via.placeholder.com/50" alt="Logo Samsung" style="max-width: 50px;"></td>
+                    <td>Thương hiệu công nghệ</td>
+                    <td><span class="badge bg-success">Hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewBrandModal001"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editBrandModal001"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteBrandModal001"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>NH002</td>
+                    <td>Nike</td>
+                    <td><img src="https://via.placeholder.com/50" alt="Logo Nike" style="max-width: 50px;"></td>
+                    <td>Thương hiệu thời trang</td>
+                    <td><span class="badge bg-danger">Không hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewBrandModal002"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editBrandModal002"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteBrandModal002"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Thêm Nhãn Hiệu -->
+<div class="modal fade" id="addBrandModal" tabindex="-1" aria-labelledby="addBrandModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addBrandModalLabel">Thêm Nhãn Hiệu</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addBrandForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Nhãn Hiệu</label>
+                                <input type="text" name="code" class="form-control" placeholder="VD: NH003" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tên Nhãn Hiệu</label>
+                                <input type="text" name="name" class="form-control" placeholder="Nhập tên nhãn hiệu" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mô Tả</label>
+                                <textarea name="description" class="form-control" rows="4" placeholder="Mô tả nhãn hiệu"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng Thái</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="" disabled selected>Chọn trạng thái</option>
+                                    <option value="Hoạt động">Hoạt động</option>
+                                    <option value="Không hoạt động">Không hoạt động</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Logo Nhãn Hiệu</label>
+                                <input type="file" name="logo" class="form-control" accept="image/*" />
+                            </div>
+                            <div class="mb-3 text-center">
+                                <img id="logoPreview" src="#" alt="Logo xem trước" style="max-width: 100%; max-height: 200px; display: none;" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="addBrandForm" class="btn btn-success">Thêm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Nhãn Hiệu NH001 -->
+<div class="modal fade" id="viewBrandModal001" tabindex="-1" aria-labelledby="viewBrandModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewBrandModalLabel001">Chi Tiết Nhãn Hiệu NH001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Nhãn Hiệu:</strong> NH001</p>
+                <p><strong>Tên Nhãn Hiệu:</strong> Samsung</p>
+                <p><strong>Mô Tả:</strong> Thương hiệu công nghệ</p>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+                <p><strong>Logo:</strong><br><img src="https://via.placeholder.com/150" alt="Logo Samsung" style="max-width: 150px;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Nhãn Hiệu NH001 -->
+<div class="modal fade" id="editBrandModal001" tabindex="-1" aria-labelledby="editBrandModalLabel001" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editBrandModalLabel001">Chỉnh Sửa Nhãn Hiệu NH001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editBrandForm001">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Nhãn Hiệu</label>
+                                <input type="text" name="code" class="form-control" value="NH001" readonly />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tên Nhãn Hiệu</label>
+                                <input type="text" name="name" class="form-control" value="Samsung" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mô Tả</label>
+                                <textarea name="description" class="form-control" rows="4">Thương hiệu công nghệ</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng Thái</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="Hoạt động" selected>Hoạt động</option>
+                                    <option value="Không hoạt động">Không hoạt động</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Logo Nhãn Hiệu</label>
+                                <input type="file" name="logo" class="form-control" accept="image/*" />
+                            </div>
+                            <div class="mb-3 text-center">
+                                <img id="editLogoPreview001" src="https://via.placeholder.com/150" alt="Logo hiện tại" style="max-width: 100%; max-height: 200px;" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="editBrandForm001" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Nhãn Hiệu NH001 -->
+<div class="modal fade" id="deleteBrandModal001" tabindex="-1" aria-labelledby="deleteBrandModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteBrandModalLabel001">Xóa Nhãn Hiệu NH001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa nhãn hiệu <strong>Samsung (NH001)</strong>?</p>
+                <p><strong>Mô Tả:</strong> Thương hiệu công nghệ</p>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Nhãn Hiệu NH002 -->
+<div class="modal fade" id="viewBrandModal002" tabindex="-1" aria-labelledby="viewBrandModalLabel002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewBrandModalLabel002">Chi Tiết Nhãn Hiệu NH002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Nhãn Hiệu:</strong> NH002</p>
+                <p><strong>Tên Nhãn Hiệu:</strong> Nike</p>
+                <p><strong>Mô Tả:</strong> Thương hiệu thời trang</p>
+                <p><strong>Trạng Thái:</strong> Không hoạt động</p>
+                <p><strong>Logo:</strong><br><img src="https://via.placeholder.com/150" alt="Logo Nike" style="max-width: 150px;"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Nhãn Hiệu NH002 -->
+<div class="modal fade" id="editBrandModal002" tabindex="-1" aria-labelledby="editBrandModalLabel002" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editBrandModalLabel002">Chỉnh Sửa Nhãn Hiệu NH002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editBrandForm002">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Nhãn Hiệu</label>
+                                <input type="text" name="code" class="form-control" value="NH002" readonly />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tên Nhãn Hiệu</label>
+                                <input type="text" name="name" class="form-control" value="Nike" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mô Tả</label>
+                                <textarea name="description" class="form-control" rows="4">Thương hiệu thời trang</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng Thái</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="Hoạt động">Hoạt động</option>
+                                    <option value="Không hoạt động" selected>Không hoạt động</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Logo Nhãn Hiệu</label>
+                                <input type="file" name="logo" class="form-control" accept="image/*" />
+                            </div>
+                            <div class="mb-3 text-center">
+                                <img id="editLogoPreview002" src="https://via.placeholder.com/150" alt="Logo hiện tại" style="max-width: 100%; max-height: 200px;" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="editBrandForm002" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Nhãn Hiệu NH002 -->
+<div class="modal fade" id="deleteBrandModal002" tabindex="-1" aria-labelledby="deleteBrandModalLabel002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteBrandModalLabel002">Xóa Nhãn Hiệu NH002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa nhãn hiệu <strong>Nike (NH002)</strong>?</p>
+                <p><strong>Mô Tả:</strong> Thương hiệu thời trang</p>
+                <p><strong>Trạng Thái:</strong> Không hoạt động</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section: Thuế -->
+<div class="section" id="taxes">
+    <h2 class="mb-4">Thuế</h2>
+    <div class="filter-bar d-flex flex-wrap justify-content-between gap-3 mb-4">
+        <div class="d-flex flex-wrap gap-3">
+            <div style="min-width: 200px;">
+                <label class="form-label fw-bold">Tìm kiếm</label>
+                <input type="text" class="form-control" placeholder="Tên, mã thuế..." />
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Trạng Thái</label>
+                <select class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="Hoạt động">Hoạt động</option>
+                    <option value="Không hoạt động">Không hoạt động</option>
+                </select>
+            </div>
+        </div>
+        <div class="align-self-end">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTaxModal"><i class="bi bi-plus-circle me-1"></i> Thêm Thuế</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Mã Thuế</th>
+                    <th>Tên Thuế</th>
+                    <th>Tỷ Lệ (%)</th>
+                    <th>Mô Tả</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TH001</td>
+                    <td>VAT 10%</td>
+                    <td>10</td>
+                    <td>Thuế giá trị gia tăng 10%</td>
+                    <td><span class="badge bg-success">Hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewTaxModal001"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editTaxModal001"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteTaxModal001"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>TH002</td>
+                    <td>VAT 8%</td>
+                    <td>8</td>
+                    <td>Thuế giá trị gia tăng 8%</td>
+                    <td><span class="badge bg-danger">Không hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewTaxModal002"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editTaxModal002"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteTaxModal002"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Thêm Thuế -->
+<div class="modal fade" id="addTaxModal" tabindex="-1" aria-labelledby="addTaxModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addTaxModalLabel">Thêm Thuế</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTaxForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mã Thuế</label>
+                        <input type="text" name="code" class="form-control" placeholder="VD: TH003" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên Thuế</label>
+                        <input type="text" name="name" class="form-control" placeholder="VD: VAT 5%" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tỷ Lệ (%)</label>
+                        <input type="number" name="rate" class="form-control" min="0" max="100" step="0.1" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mô Tả</label>
+                        <textarea name="description" class="form-control" rows="4" placeholder="Mô tả thuế"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Trạng Thái</label>
+                        <select name="status" class="form-select" required>
+                            <option value="" disabled selected>Chọn trạng thái</option>
+                            <option value="Hoạt động">Hoạt động</option>
+                            <option value="Không hoạt động">Không hoạt động</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="addTaxForm" class="btn btn-success">Thêm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Thuế TH001 -->
+<div class="modal fade" id="viewTaxModal001" tabindex="-1" aria-labelledby="viewTaxModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewTaxModalLabel001">Chi Tiết Thuế TH001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Thuế:</strong> TH001</p>
+                <p><strong>Tên Thuế:</strong> VAT 10%</p>
+                <p><strong>Tỷ Lệ (%):</strong> 10</p>
+                <p><strong>Mô Tả:</strong> Thuế giá trị gia tăng 10%</p>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Thuế TH001 -->
+<div class="modal fade" id="editTaxModal001" tabindex="-1" aria-labelledby="editTaxModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editTaxModalLabel001">Chỉnh Sửa Thuế TH001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTaxForm001">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mã Thuế</label>
+                        <input type="text" name="code" class="form-control" value="TH001" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên Thuế</label>
+                        <input type="text" name="name" class="form-control" value="VAT 10%" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tỷ Lệ (%)</label>
+                        <input type="number" name="rate" class="form-control" value="10" min="0" max="100" step="0.1" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mô Tả</label>
+                        <textarea name="description" class="form-control" rows="4">Thuế giá trị gia tăng 10%</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Trạng Thái</label>
+                        <select name="status" class="form-select" required>
+                            <option value="Hoạt động" selected>Hoạt động</option>
+                            <option value="Không hoạt động">Không hoạt động</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="editTaxForm001" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Thuế TH001 -->
+<div class="modal fade" id="deleteTaxModal001" tabindex="-1" aria-labelledby="deleteTaxModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteTaxModalLabel001">Xóa Thuế TH001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa thuế <strong>VAT 10% (TH001)</strong>?</p>
+                <p><strong>Tỷ Lệ:</strong> 10%</p>
+                <p><strong>Mô Tả:</strong> Thuế giá trị gia tăng 10%</p>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Thuế TH002 -->
+<div class="modal fade" id="viewTaxModal002" tabindex="-1" aria-labelledby="viewTaxModalLabel002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewTaxModalLabel002">Chi Tiết Thuế TH002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Thuế:</strong> TH002</p>
+                <p><strong>Tên Thuế:</strong> VAT 8%</p>
+                <p><strong>Tỷ Lệ (%):</strong> 8</p>
+                <p><strong>Mô Tả:</strong> Thuế giá trị gia tăng 8%</p>
+                <p><strong>Trạng Thái:</strong> Không hoạt động</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Thuế TH002 -->
+<div class="modal fade" id="editTaxModal002" tabindex="-1" aria-labelledby="editTaxModalLabel002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editTaxModalLabel002">Chỉnh Sửa Thuế TH002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTaxForm002">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mã Thuế</label>
+                        <input type="text" name="code" class="form-control" value="TH002" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên Thuế</label>
+                        <input type="text" name="name" class="form-control" value="VAT 8%" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tỷ Lệ (%)</label>
+                        <input type="number" name="rate" class="form-control" value="8" min="0" max="100" step="0.1" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mô Tả</label>
+                        <textarea name="description" class="form-control" rows="4">Thuế giá trị gia tăng 8%</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Trạng Thái</label>
+                        <select name="status" class="form-select" required>
+                            <option value="Hoạt động">Hoạt động</option>
+                            <option value="Không hoạt động" selected>Không hoạt động</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="editTaxForm002" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Thuế TH002 -->
+<div class="modal fade" id="deleteTaxModal002" tabindex="-1" aria-labelledby="deleteTaxModalLabel002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteTaxModalLabel002">Xóa Thuế TH002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa thuế <strong>VAT 8% (TH002)</strong>?</p>
+                <p><strong>Tỷ Lệ:</strong> 8%</p>
+                <p><strong>Mô Tả:</strong> Thuế giá trị gia tăng 8%</p>
+                <p><strong>Trạng Thái:</strong> Không hoạt động</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+      <!-- Section: Đơn Vị -->
+<div class="section" id="units">
+    <h2 class="mb-4">Đơn Vị</h2>
+    <div class="filter-bar d-flex flex-wrap justify-content-between gap-3 mb-4">
+        <div class="d-flex flex-wrap gap-3">
+            <div style="min-width: 200px;">
+                <label class="form-label fw-bold">Tìm kiếm</label>
+                <input type="text" class="form-control" placeholder="Tên, mã đơn vị..." />
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Trạng Thái</label>
+                <select class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="Hoạt động">Hoạt động</option>
+                    <option value="Không hoạt động">Không hoạt động</option>
+                </select>
+            </div>
+        </div>
+        <div class="align-self-end">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUnitModal"><i class="bi bi-plus-circle me-1"></i> Thêm Đơn Vị</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Mã ĐV</th>
+                    <th>Tên Đơn Vị</th>
+                    <th>Mô Tả</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>DV001</td>
+                    <td>Cái</td>
+                    <td>Đơn vị sản phẩm riêng lẻ</td>
+                    <td><span class="badge bg-success">Hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewUnitModal001"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editUnitModal001"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUnitModal001"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>DV002</td>
+                    <td>Bộ</td>
+                    <td>Đơn vị bộ sản phẩm</td>
+                    <td><span class="badge bg-danger">Không hoạt động</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewUnitModal002"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editUnitModal002"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUnitModal002"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Thêm Đơn Vị -->
+<div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addUnitModalLabel">Thêm Đơn Vị</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUnitForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mã Đơn Vị</label>
+                        <input type="text" name="code" class="form-control" placeholder="VD: DV003" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên Đơn Vị</label>
+                        <input type="text" name="name" class="form-control" placeholder="VD: Hộp" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mô Tả</label>
+                        <textarea name="description" class="form-control" rows="4" placeholder="Mô tả đơn vị"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Trạng Thái</label>
+                        <select name="status" class="form-select" required>
+                            <option value="" disabled selected>Chọn trạng thái</option>
+                            <option value="Hoạt động">Hoạt động</option>
+                            <option value="Không hoạt động">Không hoạt động</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="addUnitForm" class="btn btn-success">Thêm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Đơn Vị DV001 -->
+<div class="modal fade" id="viewUnitModal001" tabindex="-1" aria-labelledby="viewUnitModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewUnitModalLabel001">Chi Tiết Đơn Vị DV001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Đơn Vị:</strong> DV001</p>
+                <p><strong>Tên Đơn Vị:</strong> Cái</p>
+                <p><strong>Mô Tả:</strong> Đơn vị sản phẩm riêng lẻ</p>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Đơn Vị DV001 -->
+<div class="modal fade" id="editUnitModal001" tabindex="-1" aria-labelledby="editUnitModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editUnitModalLabel001">Chỉnh Sửa Đơn Vị DV001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUnitForm001">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mã Đơn Vị</label>
+                        <input type="text" name="code" class="form-control" value="DV001" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên Đơn Vị</label>
+                        <input type="text" name="name" class="form-control" value="Cái" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mô Tả</label>
+                        <textarea name="description" class="form-control" rows="4">Đơn vị sản phẩm riêng lẻ</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Trạng Thái</label>
+                        <select name="status" class="form-select" required>
+                            <option value="Hoạt động" selected>Hoạt động</option>
+                            <option value="Không hoạt động">Không hoạt động</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="editUnitForm001" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Đơn Vị DV001 -->
+<div class="modal fade" id="deleteUnitModal001" tabindex="-1" aria-labelledby="deleteUnitModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteUnitModalLabel001">Xóa Đơn Vị DV001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa đơn vị <strong>Cái (DV001)</strong>?</p>
+                <p><strong>Mô Tả:</strong> Đơn vị sản phẩm riêng lẻ</p>
+                <p><strong>Trạng Thái:</strong> Hoạt động</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Đơn Vị DV002 -->
+<div class="modal fade" id="viewUnitModal002" tabindex="-1" aria-labelledby="viewUnitModalLabel002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewUnitModalLabel002">Chi Tiết Đơn Vị DV002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Đơn Vị:</strong> DV002</p>
+                <p><strong>Tên Đơn Vị:</strong> Bộ</p>
+                <p><strong>Mô Tả:</strong> Đơn vị bộ sản phẩm</p>
+                <p><strong>Trạng Thái:</strong> Không hoạt động</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Đơn Vị DV002 -->
+<div class="modal fade" id="editUnitModal002" tabindex="-1" aria-labelledby="editUnitModalLabel002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editUnitModalLabel002">Chỉnh Sửa Đơn Vị DV002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUnitForm002">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mã Đơn Vị</label>
+                        <input type="text" name="code" class="form-control" value="DV002" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên Đơn Vị</label>
+                        <input type="text" name="name" class="form-control" value="Bộ" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mô Tả</label>
+                        <textarea name="description" class="form-control" rows="4">Đơn vị bộ sản phẩm</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Trạng Thái</label>
+                        <select name="status" class="form-select" required>
+                            <option value="Hoạt động">Hoạt động</option>
+                            <option value="Không hoạt động" selected>Không hoạt động</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="editUnitForm002" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Đơn Vị DV002 -->
+<div class="modal fade" id="deleteUnitModal002" tabindex="-1" aria-labelledby="deleteUnitModalLabel002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteUnitModalLabel002">Xóa Đơn Vị DV002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa đơn vị <strong>Bộ (DV002)</strong>?</p>
+                <p><strong>Mô Tả:</strong> Đơn vị bộ sản phẩm</p>
+                <p><strong>Trạng Thái:</strong> Không hoạt động</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+   <!-- Section: Đơn Hàng -->
+<div class="section" id="orders">
+    <h2 class="mb-4">Đơn Hàng</h2>
+    <div class="filter-bar d-flex flex-wrap justify-content-between gap-3 mb-4">
+        <div class="d-flex flex-wrap gap-3">
+            <div style="min-width: 200px;">
+                <label class="form-label fw-bold">Tìm kiếm</label>
+                <input type="text" class="form-control" placeholder="Mã đơn, khách hàng..." />
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Trạng Thái</label>
+                <select class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="Hoàn Thành">Hoàn Thành</option>
+                    <option value="Đang Xử Lý">Đang Xử Lý</option>
+                    <option value="Hủy">Hủy</option>
+                </select>
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Phương Thức Thanh Toán</label>
+                <select class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="Tiền mặt">Tiền mặt</option>
+                    <option value="Chuyển khoản">Chuyển khoản</option>
+                    <option value="Thẻ tín dụng">Thẻ tín dụng</option>
+                </select>
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Từ ngày</label>
+                <input type="date" class="form-control" value="2025-04-01" />
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Đến ngày</label>
+                <input type="date" class="form-control" value="2025-04-16" />
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Tổng Tiền Tối Thiểu</label>
+                <input type="text" class="form-control" placeholder="VD: 1,000,000" />
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Tổng Tiền Tối Đa</label>
+                <input type="text" class="form-control" placeholder="VD: 5,000,000" />
+            </div>
+        </div>
+        <div class="align-self-end">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addOrderModal"><i class="bi bi-plus-circle me-1"></i> Thêm Đơn Hàng</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Mã Đơn</th>
+                    <th>Khách Hàng</th>
+                    <th>Ngày Đặt</th>
+                    <th>Số Lượng SP</th>
+                    <th>Tổng Tiền</th>
+                    <th>Phương Thức TT</th>
+                    <th>Trạng Thái</th>
+                    <th>Ghi Chú</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#00123</td>
+                    <td>Nguyễn Văn A</td>
+                    <td>09/04/2025 14:30</td>
+                    <td>3</td>
+                    <td>1,500,000 VNĐ</td>
+                    <td>Tiền mặt</td>
+                    <td><span class="badge bg-success">Hoàn Thành</span></td>
+                    <td>Giao hàng nhanh</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewOrderModal123"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editOrderModal123"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteOrderModal123"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>#00124</td>
+                    <td>Trần Thị B</td>
+                    <td>10/04/2025 09:15</td>
+                    <td>1</td>
+                    <td>2,300,000 VNĐ</td>
+                    <td>Chuyển khoản</td>
+                    <td><span class="badge bg-warning">Đang Xử Lý</span></td>
+                    <td>Khách yêu cầu kiểm tra hàng</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewOrderModal124"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editOrderModal124"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteOrderModal124"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Thêm Đơn Hàng -->
+<div class="modal fade" id="addOrderModal" tabindex="-1" aria-labelledby="addOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addOrderModalLabel">Thêm Đơn Hàng</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addOrderForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Đơn Hàng</label>
+                                <input type="text" name="code" class="form-control" placeholder="VD: #00125" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Khách Hàng</label>
+                                <input type="text" name="customer" class="form-control" placeholder="VD: Nguyễn Văn C" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày Đặt</label>
+                                <input type="datetime-local" name="date" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Phương Thức Thanh Toán</label>
+                                <select name="paymentMethod" class="form-select" required>
+                                    <option value="" disabled selected>Chọn phương thức</option>
+                                    <option value="Tiền mặt">Tiền mặt</option>
+                                    <option value="Chuyển khoản">Chuyển khoản</option>
+                                    <option value="Thẻ tín dụng">Thẻ tín dụng</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng Thái</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="" disabled selected>Chọn trạng thái</option>
+                                    <option value="Hoàn Thành">Hoàn Thành</option>
+                                    <option value="Đang Xử Lý">Đang Xử Lý</option>
+                                    <option value="Hủy">Hủy</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Sản Phẩm</label>
+                                <div class="product-list">
+                                    <div class="product-item mb-2 d-flex gap-2">
+                                        <select name="products[]" class="form-select" required>
+                                            <option value="" disabled selected>Chọn sản phẩm</option>
+                                            <option value="Điện thoại X">Điện thoại X (500,000 VNĐ)</option>
+                                            <option value="Ốp lưng">Ốp lưng (50,000 VNĐ)</option>
+                                            <option value="Máy tính bảng Y">Máy tính bảng Y (2,300,000 VNĐ)</option>
+                                        </select>
+                                        <input type="number" name="quantities[]" class="form-control" style="width: 100px;" min="1" placeholder="SL" required />
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm add-product"><i class="bi bi-plus-circle"></i> Thêm sản phẩm</button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Giảm Giá</label>
+                                <input type="text" name="discount" class="form-control" placeholder="VD: 100,000 VNĐ" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ghi Chú</label>
+                                <textarea name="notes" class="form-control" rows="4" placeholder="Ghi chú đơn hàng"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="addOrderForm" class="btn btn-success">Thêm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Đơn Hàng #00123 -->
+<div class="modal fade" id="viewOrderModal123" tabindex="-1" aria-labelledby="viewOrderModalLabel123" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewOrderModalLabel123">Chi Tiết Đơn Hàng #00123</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Đơn Hàng:</strong> #00123</p>
+                <p><strong>Khách Hàng:</strong> Nguyễn Văn A</p>
+                <p><strong>Ngày Đặt:</strong> 09/04/2025 14:30</p>
+                <p><strong>Phương Thức Thanh Toán:</strong> Tiền mặt</p>
+                <p><strong>Trạng Thái:</strong> Hoàn Thành</p>
+                <p><strong>Ghi Chú:</strong> Giao hàng nhanh</p>
+                <p><strong>Sản Phẩm:</strong></p>
+                <ul>
+                    <li>Điện thoại X - Số lượng: 2 - Giá: 1,000,000 VNĐ</li>
+                    <li>Ốp lưng - Số lượng: 1 - Giá: 50,000 VNĐ</li>
+                </ul>
+                <p><strong>Giảm Giá:</strong> 0 VNĐ</p>
+                <p><strong>Tổng Tiền:</strong> 1,500,000 VNĐ</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Đơn Hàng #00123 -->
+<div class="modal fade" id="editOrderModal123" tabindex="-1" aria-labelledby="editOrderModalLabel123" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editOrderModalLabel123">Chỉnh Sửa Đơn Hàng #00123</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editOrderForm123">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Đơn Hàng</label>
+                                <input type="text" name="code" class="form-control" value="#00123" readonly />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Khách Hàng</label>
+                                <input type="text" name="customer" class="form-control" value="Nguyễn Văn A" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày Đặt</label>
+                                <input type="datetime-local" name="date" class="form-control" value="2025-04-09T14:30" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Phương Thức Thanh Toán</label>
+                                <select name="paymentMethod" class="form-select" required>
+                                    <option value="Tiền mặt" selected>Tiền mặt</option>
+                                    <option value="Chuyển khoản">Chuyển khoản</option>
+                                    <option value="Thẻ tín dụng">Thẻ tín dụng</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng Thái</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="Hoàn Thành" selected>Hoàn Thành</option>
+                                    <option value="Đang Xử Lý">Đang Xử Lý</option>
+                                    <option value="Hủy">Hủy</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Sản Phẩm</label>
+                                <div class="product-list">
+                                    <div class="product-item mb-2 d-flex gap-2">
+                                        <select name="products[]" class="form-select" required>
+                                            <option value="Điện thoại X" selected>Điện thoại X (500,000 VNĐ)</option>
+                                            <option value="Ốp lưng">Ốp lưng (50,000 VNĐ)</option>
+                                            <option value="Máy tính bảng Y">Máy tính bảng Y (2,300,000 VNĐ)</option>
+                                        </select>
+                                        <input type="number" name="quantities[]" class="form-control" style="width: 100px;" value="2" min="1" required />
+                                    </div>
+                                    <div class="product-item mb-2 d-flex gap-2">
+                                        <select name="products[]" class="form-select" required>
+                                            <option value="Điện thoại X">Điện thoại X (500,000 VNĐ)</option>
+                                            <option value="Ốp lưng" selected>Ốp lưng (50,000 VNĐ)</option>
+                                            <option value="Máy tính bảng Y">Máy tính bảng Y (2,300,000 VNĐ)</option>
+                                        </select>
+                                        <input type="number" name="quantities[]" class="form-control" style="width: 100px;" value="1" min="1" required />
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm add-product"><i class="bi bi-plus-circle"></i> Thêm sản phẩm</button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Giảm Giá</label>
+                                <input type="text" name="discount" class="form-control" value="0 VNĐ" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ghi Chú</label>
+                                <textarea name="notes" class="form-control" rows="4">Giao hàng nhanh</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="editOrderForm123" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Đơn Hàng #00123 -->
+<div class="modal fade" id="deleteOrderModal123" tabindex="-1" aria-labelledby="deleteOrderModalLabel123" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteOrderModalLabel123">Xóa Đơn Hàng #00123</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa đơn hàng <strong>#00123</strong>?</p>
+                <p><strong>Khách Hàng:</strong> Nguyễn Văn A</p>
+                <p><strong>Ngày Đặt:</strong> 09/04/2025 14:30</p>
+                <p><strong>Sản Phẩm:</strong> Điện thoại X (2), Ốp lưng (1)</p>
+                <p><strong>Tổng Tiền:</strong> 1,500,000 VNĐ</p>
+                <p><strong>Phương Thức Thanh Toán:</strong> Tiền mặt</p>
+                <p><strong>Trạng Thái:</strong> Hoàn Thành</p>
+                <p><strong>Ghi Chú:</strong> Giao hàng nhanh</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Đơn Hàng #00124 -->
+<div class="modal fade" id="viewOrderModal124" tabindex="-1" aria-labelledby="viewOrderModalLabel124" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewOrderModalLabel124">Chi Tiết Đơn Hàng #00124</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Đơn Hàng:</strong> #00124</p>
+                <p><strong>Khách Hàng:</strong> Trần Thị B</p>
+                <p><strong>Ngày Đặt:</strong> 10/04/2025 09:15</p>
+                <p><strong>Phương Thức Thanh Toán:</strong> Chuyển khoản</p>
+                <p><strong>Trạng Thái:</strong> Đang Xử Lý</p>
+                <p><strong>Ghi Chú:</strong> Khách yêu cầu kiểm tra hàng</p>
+                <p><strong>Sản Phẩm:</strong></p>
+                <ul>
+                    <li>Máy tính bảng Y - Số lượng: 1 - Giá: 2,300,000 VNĐ</li>
+                </ul>
+                <p><strong>Giảm Giá:</strong> 0 VNĐ</p>
+                <p><strong>Tổng Tiền:</strong> 2,300,000 VNĐ</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Đơn Hàng #00124 -->
+<div class="modal fade" id="editOrderModal124" tabindex="-1" aria-labelledby="editOrderModalLabel124" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editOrderModalLabel124">Chỉnh Sửa Đơn Hàng #00124</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editOrderForm124">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Đơn Hàng</label>
+                                <input type="text" name="code" class="form-control" value="#00124" readonly />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Khách Hàng</label>
+                                <input type="text" name="customer" class="form-control" value="Trần Thị B" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày Đặt</label>
+                                <input type="datetime-local" name="date" class="form-control" value="2025-04-10T09:15" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Phương Thức Thanh Toán</label>
+                                <select name="paymentMethod" class="form-select" required>
+                                    <option value="Tiền mặt">Tiền mặt</option>
+                                    <option value="Chuyển khoản" selected>Chuyển khoản</option>
+                                    <option value="Thẻ tín dụng">Thẻ tín dụng</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng Thái</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="Hoàn Thành">Hoàn Thành</option>
+                                    <option value="Đang Xử Lý" selected>Đang Xử Lý</option>
+                                    <option value="Hủy">Hủy</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Sản Phẩm</label>
+                                <div class="product-list">
+                                    <div class="product-item mb-2 d-flex gap-2">
+                                        <select name="products[]" class="form-select" required>
+                                            <option value="Điện thoại X">Điện thoại X (500,000 VNĐ)</option>
+                                            <option value="Ốp lưng">Ốp lưng (50,000 VNĐ)</option>
+                                            <option value="Máy tính bảng Y" selected>Máy tính bảng Y (2,300,000 VNĐ)</option>
+                                        </select>
+                                        <input type="number" name="quantities[]" class="form-control" style="width: 100px;" value="1" min="1" required />
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm add-product"><i class="bi bi-plus-circle"></i> Thêm sản phẩm</button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Giảm Giá</label>
+                                <input type="text" name="discount" class="form-control" value="0 VNĐ" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ghi Chú</label>
+                                <textarea name="notes" class="form-control" rows="4">Khách yêu cầu kiểm tra hàng</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="editOrderForm124" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Đơn Hàng #00124 -->
+<div class="modal fade" id="deleteOrderModal124" tabindex="-1" aria-labelledby="deleteOrderModalLabel124" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteOrderModalLabel124">Xóa Đơn Hàng #00124</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa đơn hàng <strong>#00124</strong>?</p>
+                <p><strong>Khách Hàng:</strong> Trần Thị B</p>
+                <p><strong>Ngày Đặt:</strong> 10/04/2025 09:15</p>
+                <p><strong>Sản Phẩm:</strong> Máy tính bảng Y (1)</p>
+                <p><strong>Tổng Tiền:</strong> 2,300,000 VNĐ</p>
+                <p><strong>Phương Thức Thanh Toán:</strong> Chuyển khoản</p>
+                <p><strong>Trạng Thái:</strong> Đang Xử Lý</p>
+                <p><strong>Ghi Chú:</strong> Khách yêu cầu kiểm tra hàng</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+       <!-- Section: Trả Hàng -->
+<div class="section" id="returns">
+    <h2 class="mb-4">Trả Hàng</h2>
+    <div class="filter-bar d-flex flex-wrap justify-content-between gap-3 mb-4">
+        <div class="d-flex flex-wrap gap-3">
+            <div style="min-width: 200px;">
+                <label class="form-label fw-bold">Tìm kiếm</label>
+                <input type="text" class="form-control" placeholder="Mã trả, mã đơn, khách hàng..." />
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Trạng Thái</label>
+                <select class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="Đã xử lý">Đã xử lý</option>
+                    <option value="Chưa xử lý">Chưa xử lý</option>
+                </select>
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Lý Do</label>
+                <select class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="Sản phẩm lỗi">Sản phẩm lỗi</option>
+                    <option value="Khách không còn nhu cầu">Khách không còn nhu cầu</option>
+                    <option value="Khác">Khác</option>
+                </select>
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Từ ngày</label>
+                <input type="date" class="form-control" value="2025-04-01" />
+            </div>
+            <div style="min-width: 150px;">
+                <label class="form-label fw-bold">Đến ngày</label>
+                <input type="date" class="form-control" value="2025-04-16" />
+            </div>
+        </div>
+        <div class="align-self-end">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addReturnModal"><i class="bi bi-plus-circle me-1"></i> Thêm Trả Hàng</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Mã Trả</th>
+                    <th>Mã Đơn</th>
+                    <th>Khách Hàng</th>
+                    <th>Ngày Trả</th>
+                    <th>Số Lượng SP</th>
+                    <th>Tổng Tiền</th>
+                    <th>Lý Do</th>
+                    <th>Trạng Thái</th>
+                    <th>Ghi Chú</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TH001</td>
+                    <td>#00125</td>
+                    <td>Nguyễn Văn C</td>
+                    <td>08/04/2025 16:45</td>
+                    <td>3</td>
+                    <td>750,000 VNĐ</td>
+                    <td>Khách không còn nhu cầu</td>
+                    <td><span class="badge bg-success">Đã xử lý</span></td>
+                    <td>Hoàn tiền qua chuyển khoản</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewReturnModal001"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editReturnModal001"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteReturnModal001"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>TH002</td>
+                    <td>#00123</td>
+                    <td>Nguyễn Văn A</td>
+                    <td>09/04/2025 15:00</td>
+                    <td>1</td>
+                    <td>50,000 VNĐ</td>
+                    <td>Sản phẩm lỗi</td>
+                    <td><span class="badge bg-warning">Chưa xử lý</span></td>
+                    <td>Chờ kiểm tra sản phẩm</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewReturnModal002"><i class="bi bi-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editReturnModal002"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteReturnModal002"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal: Thêm Trả Hàng -->
+<div class="modal fade" id="addReturnModal" tabindex="-1" aria-labelledby="addReturnModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="addReturnModalLabel">Thêm Trả Hàng</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addReturnForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Trả Hàng</label>
+                                <input type="text" name="returnCode" class="form-control" placeholder="VD: TH003" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Đơn Hàng</label>
+                                <select name="orderCode" class="form-select" required>
+                                    <option value="" disabled selected>Chọn mã đơn hàng</option>
+                                    <option value="#00123">#00123</option>
+                                    <option value="#00124">#00124</option>
+                                    <option value="#00125">#00125</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Khách Hàng</label>
+                                <input type="text" name="customer" class="form-control" placeholder="VD: Nguyễn Văn D" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày Trả</label>
+                                <input type="datetime-local" name="returnDate" class="form-control" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng Thái</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="" disabled selected>Chọn trạng thái</option>
+                                    <option value="Đã xử lý">Đã xử lý</option>
+                                    <option value="Chưa xử lý">Chưa xử lý</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Sản Phẩm Trả</label>
+                                <div class="product-list">
+                                    <div class="product-item mb-2 d-flex gap-2">
+                                        <select name="products[]" class="form-select" required>
+                                            <option value="" disabled selected>Chọn sản phẩm</option>
+                                            <option value="Tai nghe Z">Tai nghe Z (250,000 VNĐ)</option>
+                                            <option value="Ốp lưng">Ốp lưng (50,000 VNĐ)</option>
+                                            <option value="Điện thoại X">Điện thoại X (500,000 VNĐ)</option>
+                                        </select>
+                                        <input type="number" name="quantities[]" class="form-control" style="width: 100px;" min="1" placeholder="SL" required />
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm add-product"><i class="bi bi-plus-circle"></i> Thêm sản phẩm</button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Lý Do</label>
+                                <select name="reason" class="form-select" required>
+                                    <option value="" disabled selected>Chọn lý do</option>
+                                    <option value="Sản phẩm lỗi">Sản phẩm lỗi</option>
+                                    <option value="Khách không còn nhu cầu">Khách không còn nhu cầu</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ghi Chú</label>
+                                <textarea name="notes" class="form-control" rows="4" placeholder="Ghi chú trả hàng"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="addReturnForm" class="btn btn-success">Thêm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Trả Hàng TH001 -->
+<div class="modal fade" id="viewReturnModal001" tabindex="-1" aria-labelledby="viewReturnModalLabel001" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewReturnModalLabel001">Chi Tiết Trả Hàng TH001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Trả Hàng:</strong> TH001</p>
+                <p><strong>Mã Đơn Hàng:</strong> #00125</p>
+                <p><strong>Khách Hàng:</strong> Nguyễn Văn C</p>
+                <p><strong>Ngày Trả:</strong> 08/04/2025 16:45</p>
+                <p><strong>Lý Do:</strong> Khách không còn nhu cầu</p>
+                <p><strong>Trạng Thái:</strong> Đã xử lý</p>
+                <p><strong>Ghi Chú:</strong> Hoàn tiền qua chuyển khoản</p>
+                <p><strong>Sản Phẩm Trả:</strong></p>
+                <ul>
+                    <li>Tai nghe Z - Số lượng: 3 - Giá: 750,000 VNĐ</li>
+                </ul>
+                <p><strong>Tổng Tiền:</strong> 750,000 VNĐ</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Trả Hàng TH001 -->
+<div class="modal fade" id="editReturnModal001" tabindex="-1" aria-labelledby="editReturnModalLabel001" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editReturnModalLabel001">Chỉnh Sửa Trả Hàng TH001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editReturnForm001">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Trả Hàng</label>
+                                <input type="text" name="returnCode" class="form-control" value="TH001" readonly />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Đơn Hàng</label>
+                                <select name="orderCode" class="form-select" required>
+                                    <option value="#00125" selected>#00125</option>
+                                    <option value="#00123">#00123</option>
+                                    <option value="#00124">#00124</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Khách Hàng</label>
+                                <input type="text" name="customer" class="form-control" value="Nguyễn Văn C" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày Trả</label>
+                                <input type="datetime-local" name="returnDate" class="form-control" value="2025-04-08T16:45" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng Thái</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="Đã xử lý" selected>Đã xử lý</option>
+                                    <option value="Chưa xử lý">Chưa xử lý</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Sản Phẩm Trả</label>
+                                <div class="product-list">
+                                    <div class="product-item mb-2 d-flex gap-2">
+                                        <select name="products[]" class="form-select" required>
+                                            <option value="Tai nghe Z" selected>Tai nghe Z (250,000 VNĐ)</option>
+                                            <option value="Ốp lưng">Ốp lưng (50,000 VNĐ)</option>
+                                            <option value="Điện thoại X">Điện thoại X (500,000 VNĐ)</option>
+                                        </select>
+                                        <input type="number" name="quantities[]" class="form-control" style="width: 100px;" value="3" min="1" required />
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm add-product"><i class="bi bi-plus-circle"></i> Thêm sản phẩm</button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Lý Do</label>
+                                <select name="reason" class="form-select" required>
+                                    <option value="Sản phẩm lỗi">Sản phẩm lỗi</option>
+                                    <option value="Khách không còn nhu cầu" selected>Khách không còn nhu cầu</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ghi Chú</label>
+                                <textarea name="notes" class="form-control" rows="4">Hoàn tiền qua chuyển khoản</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="editReturnForm001" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Trả Hàng TH001 -->
+<div class="modal fade" id="deleteReturnModal001" tabindex="-1" aria-labelledby="deleteReturnModalLabel001" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteReturnModalLabel001">Xóa Trả Hàng TH001</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa trả hàng <strong>TH001</strong>?</p>
+                <p><strong>Mã Đơn Hàng:</strong> #00125</p>
+                <p><strong>Khách Hàng:</strong> Nguyễn Văn C</p>
+                <p><strong>Ngày Trả:</strong> 08/04/2025 16:45</p>
+                <p><strong>Sản Phẩm:</strong> Tai nghe Z (3)</p>
+                <p><strong>Tổng Tiền:</strong> 750,000 VNĐ</p>
+                <p><strong>Lý Do:</strong> Khách không còn nhu cầu</p>
+                <p><strong>Trạng Thái:</strong> Đã xử lý</p>
+                <p><strong>Ghi Chú:</strong> Hoàn tiền qua chuyển khoản</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xem Trả Hàng TH002 -->
+<div class="modal fade" id="viewReturnModal002" tabindex="-1" aria-labelledby="viewReturnModalLabel002" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="viewReturnModalLabel002">Chi Tiết Trả Hàng TH002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Mã Trả Hàng:</strong> TH002</p>
+                <p><strong>Mã Đơn Hàng:</strong> #00123</p>
+                <p><strong>Khách Hàng:</strong> Nguyễn Văn A</p>
+                <p><strong>Ngày Trả:</strong> 09/04/2025 15:00</p>
+                <p><strong>Lý Do:</strong> Sản phẩm lỗi</p>
+                <p><strong>Trạng Thái:</strong> Chưa xử lý</p>
+                <p><strong>Ghi Chú:</strong> Chờ kiểm tra sản phẩm</p>
+                <p><strong>Sản Phẩm Trả:</strong></p>
+                <ul>
+                    <li>Ốp lưng - Số lượng: 1 - Giá: 50,000 VNĐ</li>
+                </ul>
+                <p><strong>Tổng Tiền:</strong> 50,000 VNĐ</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Sửa Trả Hàng TH002 -->
+<div class="modal fade" id="editReturnModal002" tabindex="-1" aria-labelledby="editReturnModalLabel002" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editReturnModalLabel002">Chỉnh Sửa Trả Hàng TH002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editReturnForm002">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Trả Hàng</label>
+                                <input type="text" name="returnCode" class="form-control" value="TH002" readonly />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mã Đơn Hàng</label>
+                                <select name="orderCode" class="form-select" required>
+                                    <option value="#00123" selected>#00123</option>
+                                    <option value="#00124">#00124</option>
+                                    <option value="#00125">#00125</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Khách Hàng</label>
+                                <input type="text" name="customer" class="form-control" value="Nguyễn Văn A" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày Trả</label>
+                                <input type="datetime-local" name="returnDate" class="form-control" value="2025-04-09T15:00" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng Thái</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="Đã xử lý">Đã xử lý</option>
+                                    <option value="Chưa xử lý" selected>Chưa xử lý</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Sản Phẩm Trả</label>
+                                <div class="product-list">
+                                    <div class="product-item mb-2 d-flex gap-2">
+                                        <select name="products[]" class="form-select" required>
+                                            <option value="Tai nghe Z">Tai nghe Z (250,000 VNĐ)</option>
+                                            <option value="Ốp lưng" selected>Ốp lưng (50,000 VNĐ)</option>
+                                            <option value="Điện thoại X">Điện thoại X (500,000 VNĐ)</option>
+                                        </select>
+                                        <input type="number" name="quantities[]" class="form-control" style="width: 100px;" value="1" min="1" required />
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm add-product"><i class="bi bi-plus-circle"></i> Thêm sản phẩm</button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Lý Do</label>
+                                <select name="reason" class="form-select" required>
+                                    <option value="Sản phẩm lỗi" selected>Sản phẩm lỗi</option>
+                                    <option value="Khách không còn nhu cầu">Khách không còn nhu cầu</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ghi Chú</label>
+                                <textarea name="notes" class="form-control" rows="4">Chờ kiểm tra sản phẩm</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" form="editReturnForm002" class="btn btn-primary">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Xóa Trả Hàng TH002 -->
+<div class="modal fade" id="deleteReturnModal002" tabindex="-1" aria-labelledby="deleteReturnModalLabel002" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteReturnModalLabel002">Xóa Trả Hàng TH002</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa trả hàng <strong>TH002</strong>?</p>
+                <p><strong>Mã Đơn Hàng:</strong> #00123</p>
+                <p><strong>Khách Hàng:</strong> Nguyễn Văn A</p>
+                <p><strong>Ngày Trả:</strong> 09/04/2025 15:00</p>
+                <p><strong>Sản Phẩm:</strong> Ốp lưng (1)</p>
+                <p><strong>Tổng Tiền:</strong> 50,000 VNĐ</p>
+                <p><strong>Lý Do:</strong> Sản phẩm lỗi</p>
+                <p><strong>Trạng Thái:</strong> Chưa xử lý</p>
+                <p><strong>Ghi Chú:</strong> Chờ kiểm tra sản phẩm</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+        <!-- ---------------------------------Section: Cài Đặt ------------------------------------->
+        <div class="section" id="settings">
+            <h2 class="mb-4">Cài Đặt</h2>
+            <div class="filter-bar d-flex flex-wrap justify-content-between gap-3">
+                <div class="d-flex flex-wrap gap-3">
+                    <div style="min-width: 200px;">
+                        <label class="form-label fw-bold">Tìm kiếm</label>
+                        <input type="text" class="form-control" placeholder="Tìm cài đặt..." id="searchSettings" />
+                    </div>
+                </div>
+                <div class="align-self-end">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addSettingModal"><i class="bi bi-plus-circle me-1"></i> Thêm Cài Đặt</button>
+                </div>
+            </div>
+            <div class="row g-4">
+                <!-- Card: Thông Tin Cửa Hàng -->
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <h5 class="mb-3"><i class="bi bi-shop me-2"></i>Thông Tin Cửa Hàng</h5>
+                        <form id="storeInfoForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tên Cửa Hàng</label>
+                                <input type="text" class="form-control" value="Cửa Hàng ABC" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Địa Chỉ</label>
+                                <input type="text" class="form-control" value="123 Đường Lê Lợi, TP.HCM" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Số Điện Thoại</label>
+                                <input type="tel" class="form-control" value="0123 456 789" pattern="[0-9]{10,11}" required />
+                            </div>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- Card: Tùy Chỉnh Giao Diện -->
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <h5 class="mb-3"><i class="bi bi-palette me-2"></i>Tùy Chỉnh Giao Diện</h5>
+                        <form id="themeForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Màu Chủ Đạo</label>
+                                <input type="color" class="form-control form-control-color" value="#108AB1" id="themeColor" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Chế Độ Giao Diện</label>
+                                <select class="form-select" id="themeMode">
+                                    <option value="light" selected>Sáng</option>
+                                    <option value="dark">Tối</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- Card: Quản Lý Thông Báo -->
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <h5 class="mb-3"><i class="bi bi-bell me-2"></i>Quản Lý Thông Báo</h5>
+                        <form id="notificationForm">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="notifyOrder" checked>
+                                    <label class="form-check-label" for="notifyOrder">Thông báo đơn hàng mới</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="notifyReturn">
+                                    <label class="form-check-label" for="notifyReturn">Thông báo trả hàng</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="notifyStock">
+                                    <label class="form-check-label" for="notifyStock">Thông báo tồn kho thấp</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Thêm Cài Đặt -->
+            <div class="modal fade" id="addSettingModal" tabindex="-1" aria-labelledby="addSettingModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="addSettingModalLabel">Thêm Cài Đặt</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addSettingForm">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Tên Cài Đặt</label>
+                                    <input type="text" class="form-control" placeholder="VD: Cấu hình email" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Giá Trị</label>
+                                    <input type="text" class="form-control" placeholder="Nhập giá trị" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Mô Tả</label>
+                                    <textarea class="form-control" rows="3" placeholder="Mô tả cài đặt"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" form="addSettingForm" class="btn btn-success">Thêm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      
+            
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+ <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Lấy các phần tử DOM
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const mainContent = document.querySelector('.main-content');
+        const navLinks = document.querySelectorAll('.sidebar .nav-link');
+        const sections = document.querySelectorAll('.section');
+        const currentDateTime = document.getElementById('currentDateTime');
+    
+        // Hàm hiển thị ngày giờ hiện tại
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            currentDateTime.textContent = now.toLocaleString('vi-VN', options);
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    
+        // Toggle sidebar trên thiết bị di động
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('shifted');
+        });
+    
+        // Điều hướng sidebar
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+    
+                // Ẩn tất cả section
+                sections.forEach(section => section.classList.remove('active'));
+                // Hiển thị section được chọn
+                document.getElementById(sectionId).classList.add('active');
+    
+                // Cập nhật trạng thái active cho link
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+    
+                // Đóng sidebar trên mobile sau khi chọn
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+    
+        // Vẽ biểu đồ doanh thu
+        const revenueChart = new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: {
+                labels: ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6'],
+                datasets: [{
+                    label: 'Doanh Thu (triệu VNĐ)',
+                    data: [50, 60, 55, 70, 65, 80],
+                    borderColor: '#108AB1',
+                    backgroundColor: 'rgba(16, 138, 177, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    
+        // Vẽ biểu đồ trạng thái đơn hàng
+        const statusChart = new Chart(document.getElementById('statusChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Hoàn Thành', 'Đang Xử Lý', 'Hủy'],
+                datasets: [{
+                    data: [60, 30, 10],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    
+        // Xử lý tìm kiếm và lọc sản phẩm
+        const productSearch = document.querySelector('#productList input[type="text"]');
+        const productCategoryFilter = document.querySelector('#productList select:nth-of-type(1)');
+        const productStatusFilter = document.querySelector('#productList select:nth-of-type(2)');
+        const productTableBody = document.querySelector('#productList tbody');
+    
+        function filterProducts() {
+            const searchTerm = productSearch.value.toLowerCase();
+            const category = productCategoryFilter.value;
+            const status = productStatusFilter.value;
+    
+            const rows = productTableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const code = row.cells[0].textContent.toLowerCase();
+                const name = row.cells[1].textContent.toLowerCase();
+                const rowCategory = row.cells[2].textContent;
+                const rowStatus = row.cells[5].textContent;
+    
+                const matchesSearch = code.includes(searchTerm) || name.includes(searchTerm);
+                const matchesCategory = !category || rowCategory === category;
+                const matchesStatus = !status || rowStatus.includes(status);
+    
+                row.style.display = matchesSearch && matchesCategory && matchesStatus ? '' : 'none';
+            });
+        }
+    
+        productSearch.addEventListener('input', filterProducts);
+        productCategoryFilter.addEventListener('change', filterProducts);
+        productStatusFilter.addEventListener('change', filterProducts);
+    
+        // Xử lý form thêm sản phẩm
+        const addProductForm = document.querySelector('#addProductModal form');
+        addProductForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(addProductForm);
+            const productData = {
+                code: formData.get('code'),
+                name: formData.get('name'),
+                category: formData.get('category'),
+                quantity: formData.get('quantity'),
+                price: formData.get('price')
+            };
+    
+            // Thêm sản phẩm vào bảng (giả lập)
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${productData.code}</td>
+                <td>${productData.name}</td>
+                <td>${productData.category}</td>
+                <td>${productData.quantity}</td>
+                <td>${productData.price}</td>
+                <td><span class="badge bg-success">Còn hàng</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#viewProductModal${productData.code}"><i class="bi bi-eye"></i></button>
+                    <button class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#editProductModal${productData.code}"><i class="bi bi-pencil-square"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteProductModal${productData.code}"><i class="bi bi-trash"></i></button>
+                </td>
+            `;
+            productTableBody.appendChild(newRow);
+    
+            // Đóng modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+            modal.hide();
+            addProductForm.reset();
+        });
+    
+        // Xử lý form cài đặt cửa hàng
+        const storeInfoForm = document.getElementById('storeInfoForm');
+        storeInfoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(storeInfoForm);
+            console.log('Cập nhật thông tin cửa hàng:', {
+                name: formData.get('name'),
+                address: formData.get('address'),
+                phone: formData.get('phone')
+            });
+            alert('Đã lưu thông tin cửa hàng!');
+        });
+    
+        // Xử lý form giao diện
+        const themeForm = document.getElementById('themeForm');
+        themeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const themeColor = document.getElementById('themeColor').value;
+            const themeMode = document.getElementById('themeMode').value;
+            document.documentElement.style.setProperty('--primary-color', themeColor);
+            document.body.classList.toggle('dark-mode', themeMode === 'dark');
+            alert('Đã cập nhật giao diện!');
+        });
+    
+        // Xử lý form thông báo
+        const notificationForm = document.getElementById('notificationForm');
+        notificationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const notifications = {
+                order: document.getElementById('notifyOrder').checked,
+                return: document.getElementById('notifyReturn').checked,
+                stock: document.getElementById('notifyStock').checked
+            };
+            console.log('Cài đặt thông báo:', notifications);
+            alert('Đã lưu cài đặt thông báo!');
+        });
+    
+        // Xử lý tìm kiếm cài đặt
+        const searchSettings = document.getElementById('searchSettings');
+        searchSettings.addEventListener('input', () => {
+            const term = searchSettings.value.toLowerCase();
+            const cards = document.querySelectorAll('#settings .stat-card');
+            cards.forEach(card => {
+                const title = card.querySelector('h5').textContent.toLowerCase();
+                card.style.display = title.includes(term) ? '' : 'none';
+            });
+        });
+    });
+    
+ </script>
+  

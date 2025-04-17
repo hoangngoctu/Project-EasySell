@@ -1,0 +1,569 @@
+/* 
+ * Thiết lập các biến CSS để dễ dàng quản lý màu sắc, kích thước, và các giá trị lặp lại
+ */
+ :root {
+    --primary-color: #1e90ff; /* Màu chính */
+    --secondary-color: #00d4ff; /* Màu phụ */
+    --hover-color: #1c86ee; /* Màu khi hover */
+    --text-dark: #333; /* Màu chữ tối */
+    --text-light: #666; /* Màu chữ nhạt */
+    --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+    --shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.15); /* Đổ bóng khi hover */
+    --border-radius: 15px; /* Bo góc chung */
+    --transition: all 0.3s ease; /* Hiệu ứng chuyển đổi */
+}
+
+/* 
+ * Navbar cố định 
+ */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1030;
+    box-shadow: var(--shadow-light);
+}
+
+body {
+    padding-top: 70px; /* Đảm bảo nội dung không bị che bởi navbar */
+}
+
+/* 
+ * Tùy chỉnh liên kết điều hướng 
+ */
+.nav-link {
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: var(--secondary-color);
+    transition: var(--transition);
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 50%;
+}
+
+/* 
+ * Tùy chỉnh nút Đăng Nhập 
+ */
+.btn-login {
+    background-color: var(--primary-color);
+    border: none;
+    transition: var(--transition);
+}
+
+.btn-login:hover {
+    background-color: var(--hover-color);
+}
+
+/* 
+ * Tùy chỉnh thanh cuộn 
+ */
+body::-webkit-scrollbar {
+    width: 12px;
+}
+
+body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    border: 3px solid #f1f1f1;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background-color: var(--hover-color);
+}
+
+/* 
+ * Tùy chỉnh logo navbar 
+ */
+.navbar-brand img {
+    height: 40px;
+    width: auto;
+}
+
+/* 
+ * Tùy chỉnh slideshow 
+ */
+.carousel-item img {
+    height: 500px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* 
+ * Section Features 
+ */
+.features-section {
+    padding: 50px 0;
+}
+
+.feature-card {
+    transition: var(--transition);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    border: none;
+    overflow: hidden;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card .card-body {
+    padding: 2rem;
+    text-align: center;
+}
+
+.feature-card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+}
+
+.feature-card p {
+    color: var(--text-light);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* 
+ * Section Reviews 
+ */
+.reviews-section {
+    padding: 50px 0;
+    background-color: #f8f9fa;
+}
+
+.review-card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+    background-color: white;
+}
+
+.review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.review-card .card-body {
+    padding: 2rem;
+    text-align: center;
+}
+
+.review-card img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+}
+
+.review-card h5 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.review-card .rating {
+    color: #f1c40f;
+    margin-bottom: 1rem;
+}
+
+.review-card p {
+    color: var(--text-light);
+    font-size: 1rem;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* 
+ * Section Pricing với Swiper 
+ */
+.pricing-section {
+    padding: 50px 0;
+}
+
+.swiper {
+    width: 100%;
+    padding-top: 20px;
+    padding-bottom: 50px;
+}
+
+.swiper-slide {
+    width: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.pricing-card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+    width: 300px;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.pricing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.pricing-card.popular {
+    border: 2px solid var(--primary-color);
+}
+
+.pricing-card .popular-badge {
+    position: absolute;
+    top: 20px;
+    right: -40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 5px 40px;
+    transform: rotate(45deg);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.pricing-card .card-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom: none;
+}
+
+.pricing-card .card-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.pricing-card .card-body {
+    padding: 2rem;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.pricing-card .price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.pricing-card .price span {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-light);
+}
+
+.pricing-card ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+    text-align: left;
+    flex-grow: 1;
+}
+
+.pricing-card ul li {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.pricing-card ul li i {
+    color: var(--primary-color);
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+.pricing-card .btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    color: white;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.pricing-card .btn:hover {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    transform: scale(1.05);
+}
+
+/* 
+ * Swiper Pagination 
+ */
+.swiper-pagination-bullet {
+    background: var(--primary-color);
+    opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+    background: var(--primary-color);
+    opacity: 1;
+}
+
+/* 
+ * Section News 
+ */
+.news-section {
+    padding: 50px 0;
+    background-color: #fff;
+}
+
+.news-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.news-section h2::after {
+    content: '';
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.news-card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+    background-color: white;
+    overflow: hidden;
+}
+
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.news-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.news-card:hover img {
+    transform: scale(1.05);
+}
+
+.news-card .card-body {
+    padding: 1.5rem;
+}
+
+.news-card .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.news-card .card-text {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.news-card .card-date {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 0;
+}
+
+.news-list .news-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+}
+
+.news-list .news-card img {
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    margin-right: 1rem;
+}
+
+.news-list .news-card .card-body {
+    padding: 0;
+    flex-grow: 1;
+}
+
+.news-list .news-card .card-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.news-list .news-card .card-date {
+    font-size: 0.8rem;
+}
+
+.btn-view-more {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    color: white;
+    padding: 0.75rem 2.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    transition: var(--transition);
+    box-shadow: var(--shadow-light);
+}
+
+.btn-view-more:hover {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: var(--shadow-hover);
+}
+
+/* 
+ * Section Contact 
+ */
+.contact-section {
+    padding: 50px 0;
+    background-color: #f8f9fa;
+    text-align: center;
+}
+
+.contact-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+}
+
+.contact-section p {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-info {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.contact-info div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: var(--text-dark);
+}
+
+.contact-info i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.contact-section .btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    color: white;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: var(--transition);
+    border-radius: 50px;
+}
+
+.contact-section .btn:hover {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    transform: scale(1.05);
+}
+
+/* 
+ * Responsive Design 
+ */
+@media (max-width: 991px) {
+    .news-card img {
+        height: 180px;
+    }
+    .news-list .news-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    .news-list .news-card img {
+        width: 100%;
+        height: 120px;
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .news-card img {
+        height: 150px;
+    }
+    .btn-view-more {
+        padding: 0.6rem 2rem;
+        font-size: 1rem;
+    }
+}
